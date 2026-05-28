@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Messy Desk
 
-## Getting Started
+A playful shared space for couples — hide messages in a messy desk, invite your partner when you're ready, and let them hunt at their own pace.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + React 19 + Tailwind CSS 4
+- **Supabase** — Auth, Postgres, Storage
+- **Framer Motion**, **@dnd-kit**, **TanStack Query**, **Tiptap**
+
+## Setup
+
+1. Create a [Supabase](https://supabase.com) project.
+
+2. Run migrations in order via the Supabase SQL editor:
+   - [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
+   - [`supabase/migrations/002_partner_invites.sql`](supabase/migrations/002_partner_invites.sql)
+   - [`supabase/migrations/003_repair_user_setup.sql`](supabase/migrations/003_repair_user_setup.sql) **← run this if desk/signup doesn't work**
+
+3. Copy env template and fill in values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+In Supabase **Authentication → URL Configuration**, set:
+- **Site URL**: `http://localhost:3000` (or your production URL)
+- **Redirect URLs**: `http://localhost:3000/auth/callback`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Email confirmation must be enabled under **Authentication → Providers → Email**.
 
-## Learn More
+4. Install and run:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How it works
 
-## Deploy on Vercel
+1. **You sign up** — create your desk, add hidden messages, publish when ready.
+2. **Copy your invite link** from the dashboard — send it to your partner (email, text, etc.).
+3. **Partner signs up** via your link — they join your space and can hunt your desk async.
+4. **No realtime required** — play on your own schedules.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Dual desks** — each partner designs their own messy desk with up to 8 hunt items
+- **Partner invite links** — solo setup first; partner joins via unique URL/code
+- **Scavenger hunt** — pick 3 targets; partner explores and unlocks items
+- **Shared space** — journal, record player, flora vase, haptic photo frame (async, not live-synced)
+- **Dashboard & room** — overview cards and unified room view
+
+## Project structure
+
+```
+src/
+├── app/           # Routes (auth, dashboard, room, desk editor, settings)
+├── components/    # UI, desk, hunt, shared space, journal, audio
+├── lib/           # Supabase clients, hooks, item registry
+└── types/         # TypeScript types
+supabase/migrations/
+```
+
+## Deploy
+
+Deploy to [Vercel](https://vercel.com) and set the same environment variables.
