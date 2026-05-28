@@ -14,7 +14,7 @@ export function SharedSpaceCanvas() {
 
   if (isLoading) {
     return (
-      <div className="relative h-48 sm:h-56 rounded-t-2xl bg-amber-50/50 animate-pulse" />
+      <div className="relative h-52 sm:h-60 rounded-t-xl bg-amber-50/50 animate-pulse filter-hand-drawn" />
     );
   }
 
@@ -26,14 +26,15 @@ export function SharedSpaceCanvas() {
     items.find((i) => i.slot_id === slotId);
 
   return (
-    <div className="relative h-48 sm:h-56 border-b border-stone-200/80">
+    <div className="relative h-52 sm:h-60 border-b-2 border-amber-800/15">
       <SharedSpaceBackground />
 
-      <p className="absolute top-3 left-1/2 -translate-x-1/2 text-[11px] text-stone-500/90 text-center px-4 max-w-md z-10 pointer-events-none">
-        Tap any item to read, listen, or edit — right from your nook
+      <p className="absolute top-10 left-1/2 -translate-x-1/2 text-[10px] text-amber-900/40 text-center px-4 max-w-md z-10 pointer-events-none font-display">
+        Tap any item to read, listen, or explore
       </p>
 
-      <div className="absolute inset-x-0 bottom-6 sm:bottom-8 flex flex-wrap items-end justify-center gap-3 sm:gap-6 px-3 sm:px-6">
+      {/* Items sitting on shelf */}
+      <div className="absolute inset-x-0 bottom-[22%] sm:bottom-[20%] flex flex-wrap items-end justify-center gap-2 sm:gap-5 px-3 sm:px-6">
         {SHARED_SLOTS.map(({ slotId, itemType, label }) => {
           const item = getItem(slotId);
           const props = { coupleId, item, stats };

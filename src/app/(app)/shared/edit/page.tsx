@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { SketchyCard } from "@/components/ui/SketchyCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { PageHeader } from "@/components/ui/PageHeader";
 import {
   useSharedSpace,
   useUpdateSharedItem,
@@ -82,13 +81,17 @@ export default function SharedEditPage() {
 
   return (
     <div className="max-w-lg space-y-6">
-      <PageHeader
-        title="Shared space"
-        description="Configure photo frame and playlist"
-      />
+      <div>
+        <h1 className="text-2xl font-display font-bold text-foreground">
+          Shared space
+        </h1>
+        <p className="text-sm text-muted">
+          Configure photo frame and playlist
+        </p>
+      </div>
 
-      <Card className="space-y-4">
-        <h2 className="font-semibold text-foreground">Photo frame</h2>
+      <SketchyCard rotate={false} className="space-y-4">
+        <h2 className="font-display font-semibold text-foreground">Photo frame</h2>
         <div>
           <label className="text-xs font-medium text-muted">Photo URL</label>
           <Input
@@ -100,10 +103,10 @@ export default function SharedEditPage() {
         <Button onClick={savePhoto} disabled={updateItem.isPending}>
           Save photo
         </Button>
-      </Card>
+      </SketchyCard>
 
-      <Card className="space-y-4">
-        <h2 className="font-semibold text-foreground">Record player playlist</h2>
+      <SketchyCard rotate={false} className="space-y-4">
+        <h2 className="font-display font-semibold text-foreground">Record player playlist</h2>
         {tracks.length > 0 && (
           <ul className="text-sm space-y-2 text-muted">
             {tracks.map((t) => (
@@ -113,7 +116,7 @@ export default function SharedEditPage() {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/5"
+                  className="text-destructive hover:text-destructive"
                   onClick={() => removePlaylistTrack(t.id)}
                   disabled={removingTrackId === t.id}
                 >
@@ -141,10 +144,10 @@ export default function SharedEditPage() {
         <Button onClick={addPlaylistTrack} disabled={addTrack.isPending}>
           Add track
         </Button>
-      </Card>
+      </SketchyCard>
 
-      <Card>
-        <h2 className="font-semibold text-foreground mb-2">Flora vase</h2>
+      <SketchyCard rotate={false}>
+        <h2 className="font-display font-semibold text-foreground mb-2">Flora vase</h2>
         <p className="text-sm text-muted">
           Growth stage:{" "}
           {data?.stats?.flora_stage === 4
@@ -156,7 +159,7 @@ export default function SharedEditPage() {
         <p className="text-xs text-muted mt-2">
           Write journal entries to help your plant grow.
         </p>
-      </Card>
+      </SketchyCard>
     </div>
   );
 }

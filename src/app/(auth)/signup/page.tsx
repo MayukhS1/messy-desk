@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import { isEmailVerified, authCallbackUrl } from "@/lib/auth/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card } from "@/components/ui/Card";
+import { SketchyCard } from "@/components/ui/SketchyCard";
+import { AuthShell } from "@/components/auth/AuthShell";
 
 function SignupForm() {
   const router = useRouter();
@@ -84,11 +85,11 @@ function SignupForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <h1 className="text-2xl font-serif font-bold text-amber-950 mb-2">
+    <SketchyCard rotate={false}>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-2">
         {isJoining ? "Join your partner" : "Create your desk"}
       </h1>
-      <p className="text-sm text-stone-500 mb-6">
+      <p className="text-sm text-muted mb-6">
         {isJoining
           ? inviterName
             ? `You're joining ${inviterName}'s messy desk`
@@ -97,7 +98,7 @@ function SignupForm() {
       </p>
       <form onSubmit={handleSignup} className="space-y-4">
         <div>
-          <label className="text-xs text-stone-500">Display name</label>
+          <label className="text-xs text-muted">Display name</label>
           <Input
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -105,7 +106,7 @@ function SignupForm() {
           />
         </div>
         <div>
-          <label className="text-xs text-stone-500">Email</label>
+          <label className="text-xs text-muted">Email</label>
           <Input
             type="email"
             value={email}
@@ -114,7 +115,7 @@ function SignupForm() {
           />
         </div>
         <div>
-          <label className="text-xs text-stone-500">Password</label>
+          <label className="text-xs text-muted">Password</label>
           <Input
             type="password"
             value={password}
@@ -125,7 +126,7 @@ function SignupForm() {
         </div>
         {!inviteFromUrl && (
           <div>
-            <label className="text-xs text-stone-500">
+            <label className="text-xs text-muted">
               Partner invite code (optional)
             </label>
             <Input
@@ -135,30 +136,30 @@ function SignupForm() {
             />
           </div>
         )}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Creating account…" : isJoining ? "Join & play" : "Sign up"}
         </Button>
       </form>
-      <p className="mt-3 text-xs text-stone-500 text-center">
+      <p className="mt-3 text-xs text-muted text-center">
         You&apos;ll need to verify your email before using Messy Desk.
       </p>
-      <p className="mt-4 text-sm text-stone-500 text-center">
+      <p className="mt-4 text-sm text-muted text-center">
         Already have an account?{" "}
-        <Link href="/login" className="text-amber-800 hover:underline">
+        <Link href="/login" className="text-primary hover:underline">
           Log in
         </Link>
       </p>
-    </Card>
+    </SketchyCard>
   );
 }
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-amber-50 to-stone-100">
-      <Suspense fallback={<div className="text-stone-500">Loading…</div>}>
+    <AuthShell title="Start your story">
+      <Suspense fallback={<div className="text-muted text-center">Loading…</div>}>
         <SignupForm />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }

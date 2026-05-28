@@ -23,6 +23,7 @@ export function RecordPlayerItem({
   stats?: RelationshipStats | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [showAddTrack, setShowAddTrack] = useState(false);
   const [trackTitle, setTrackTitle] = useState("");
   const [trackUrl, setTrackUrl] = useState("");
@@ -64,13 +65,38 @@ export function RecordPlayerItem({
 
   return (
     <>
-      <SharedItemButton label="Open record player" onClick={() => setOpen(true)}>
-        <SharedItemVisual
-          type="record_player"
-          size={48}
-          className={turntable.state.isPlaying ? "animate-pulse" : undefined}
-        />
-      </SharedItemButton>
+      <div className="relative">
+        <SharedItemButton
+          label="Open record player"
+          onClick={() => {
+            setShowNotes(true);
+            setTimeout(() => setShowNotes(false), 1200);
+            setOpen(true);
+          }}
+        >
+          <SharedItemVisual
+            type="record_player"
+            size={52}
+            spinning={turntable.state.isPlaying || showNotes}
+          />
+        </SharedItemButton>
+        {showNotes && (
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 pointer-events-none">
+            {["♪", "♫", "♪"].map((note, i) => (
+              <span
+                key={i}
+                className="absolute font-display text-accent-terracotta/70"
+                style={{
+                  left: `${i * 12 - 12}px`,
+                  animation: `float-note 1.2s ease-out ${i * 0.15}s forwards`,
+                }}
+              >
+                {note}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
       <InteractionModal
         open={open}
         onClose={() => setOpen(false)}

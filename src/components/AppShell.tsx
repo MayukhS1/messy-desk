@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { usePartner, useProfile } from "@/lib/hooks/useProfile";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { ClotheslineNav } from "@/components/AppShell/ClotheslineNav";
+import { CozyMessDecor } from "@/components/decor/CozyMessDecor";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,75 +13,75 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data: partner } = usePartner();
   const router = useRouter();
 
-  const nav = [
-    { href: "/dashboard", label: "Home" },
-    { href: "/room", label: "Room" },
-    { href: "/desk/edit", label: "Edit desk" },
-    { href: "/settings", label: "Settings" },
-  ];
-
   const logout = async () => {
     const supabase = createClient();
+    sessionStorage.removeItem("messy-desk-bootstrapped");
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-100 to-amber-50/30">
-      <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/dashboard" className="font-serif text-lg text-amber-900">
-            Messy Desk
-          </Link>
-          <nav className="hidden sm:flex items-center gap-1">
-            {nav.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "rounded-lg px-3 py-2 text-sm min-h-[44px] flex items-center",
-                  pathname === href || pathname.startsWith(href + "/")
-                    ? "bg-amber-100 text-amber-900"
-                    : "text-stone-600 hover:bg-stone-100"
-                )}
+    <div className="relative min-h-screen bg-paper-texture">
+      <div className="sunlight-overlay pointer-events-none fixed inset-0 z-0" aria-hidden />
+
+      <header className="sticky top-0 z-30 border-b-2 border-amber-800/15 bg-background/85 backdrop-blur-sm filter-hand-drawn">
+        <div className="mx-auto max-w-6xl px-4 py-2">
+          <div className="flex items-start justify-between gap-4">
+            <Link
+              href="/dashboard"
+              prefetch
+              className="font-display text-xl text-foreground pt-2 sketchy-focus shrink-0"
+            >
+              Messy Desk
+            </Link>
+
+            <div className="flex-1 min-w-0">
+              <ClotheslineNav pathname={pathname} />
+            </div>
+
+            <div className="hidden md:flex flex-col items-end gap-1 shrink-0 pt-1">
+              {partner && (
+                <span className="text-xs text-muted font-display">
+                  with {partner.display_name}
+                </span>
+              )}
+              <div
+                className="relative px-3 py-1.5 border-2 border-amber-800/30 bg-yellow-50/90 shadow-sm filter-hand-drawn rotate-[1deg]"
               >
-                {label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex items-center gap-3 text-sm">
-            {partner && (
-              <span className="hidden md:inline text-stone-500">
-                with {partner.display_name}
-              </span>
-            )}
-            <span className="text-stone-700">{profile?.display_name}</span>
+                <span className="text-sm text-foreground">{profile?.display_name}</span>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="ml-2 text-xs text-muted hover:text-foreground sketchy-focus min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile user bar */}
+          <div className="md:hidden flex items-center justify-between pt-2 pb-1 text-sm">
+            <span className="text-muted truncate">
+              {profile?.display_name}
+              {partner ? ` · with ${partner.display_name}` : ""}
+            </span>
             <button
               type="button"
               onClick={logout}
-              className="text-stone-500 hover:text-stone-800 min-h-[44px] min-w-[44px]"
+              className="text-muted hover:text-foreground sketchy-focus min-h-[44px] px-2"
             >
               Log out
             </button>
           </div>
         </div>
-        <nav className="sm:hidden flex border-t border-stone-100 overflow-x-auto">
-          {nav.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex-1 text-center py-3 text-xs min-h-[44px]",
-                pathname === href ? "text-amber-800 font-medium" : "text-stone-500"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6 flex-1">{children}</main>
+
+      <main className="relative mx-auto max-w-6xl px-4 py-6 flex-1 z-10">
+        <CozyMessDecor variant="subtle" />
+        {children}
+      </main>
     </div>
   );
 }

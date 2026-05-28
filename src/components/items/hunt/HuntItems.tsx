@@ -28,8 +28,8 @@ function ItemShell({
       className={cn(
         "relative flex flex-col items-center justify-center select-none touch-manipulation w-[72px] h-[72px]",
         isEdit && "group",
-        isEdit && isSelected && "ring-2 ring-amber-500 ring-offset-2 ring-offset-amber-100 rounded-xl",
-        mode === "explore" && "cursor-pointer hover:scale-105 transition-transform",
+        isEdit && isSelected && "desk-selection-glow rounded-xl",
+        mode === "explore" && "cursor-pointer",
         isView && "pointer-events-none"
       )}
       onClick={(e) => {
@@ -43,8 +43,17 @@ function ItemShell({
           onSelect?.();
         }
       }}
-      whileHover={mode === "explore" ? { scale: 1.06 } : undefined}
-      whileTap={mode === "explore" ? { scale: 0.96 } : undefined}
+      whileHover={
+        mode === "explore" || isEdit
+          ? { scale: 1.05, rotate: item.rotation * 0.1, boxShadow: "0px 10px 15px rgba(0,0,0,0.1)" }
+          : undefined
+      }
+      whileTap={
+        mode === "explore" || isEdit
+          ? { scale: 0.97, boxShadow: "0px 2px 4px rgba(0,0,0,0.08)" }
+          : undefined
+      }
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
     >
       <ItemVisual type={item.item_type} size={56} />
       {isEdit && (

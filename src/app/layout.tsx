@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { DynaPuff, Nunito } from "next/font/google";
 import { Providers } from "@/components/Providers";
+import { SketchyFilters } from "@/components/ui/SketchyFilters";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dynaPuff = DynaPuff({
+  variable: "--font-dynapuff",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,13 +29,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${nunito.variable} ${dynaPuff.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body
-        className="min-h-full flex flex-col font-sans"
+        className="min-h-full flex flex-col font-sans bg-paper-texture text-foreground"
         suppressHydrationWarning
       >
+        <SketchyFilters />
         <Providers>{children}</Providers>
       </body>
     </html>

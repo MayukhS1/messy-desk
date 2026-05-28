@@ -30,12 +30,16 @@ export function ItemVisual({
     case "envelope":
       return (
         <svg viewBox="0 0 64 64" fill="none" {...props}>
-          <rect x="10" y="18" width="44" height="30" rx="2" fill="#fef3c7" stroke="#d97706" strokeWidth="1.5" />
-          <path d="M10 20 L32 36 L54 20" stroke="#d97706" strokeWidth="1.5" fill="none" />
-          <path d="M10 48 L24 34" stroke="#fbbf24" strokeWidth="1" opacity="0.6" />
-          <path d="M54 48 L40 34" stroke="#fbbf24" strokeWidth="1" opacity="0.6" />
-          <circle cx="48" cy="22" r="6" fill="#ef4444" opacity="0.9" />
-          <path d="M45 22 h6 M48 19 v6" stroke="white" strokeWidth="1.5" />
+          {/* Canvas paper texture */}
+          <rect x="10" y="16" width="44" height="32" rx="2" fill="#fef3c7" stroke="#78350f" strokeWidth="1.5" />
+          <rect x="12" y="18" width="40" height="28" rx="1" fill="#fffbeb" opacity="0.6" />
+          <path d="M10 18 L32 34 L54 18" stroke="#92400e" strokeWidth="1.5" fill="none" />
+          <path d="M10 48 L26 34" stroke="#d97706" strokeWidth="1" opacity="0.5" />
+          <path d="M54 48 L38 34" stroke="#d97706" strokeWidth="1" opacity="0.5" />
+          {/* Wax seal */}
+          <circle cx="46" cy="20" r="7" fill="#b91c1c" stroke="#7f1d1d" strokeWidth="1" />
+          <circle cx="46" cy="20" r="5" fill="#dc2626" opacity="0.8" />
+          <path d="M44 20 Q46 17 48 20 Q46 23 44 20" fill="#fca5a5" opacity="0.5" />
         </svg>
       );
     case "box":

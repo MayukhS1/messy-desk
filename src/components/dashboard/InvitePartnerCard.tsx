@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { SketchyStickyNote } from "@/components/ui/SketchyStickyNote";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useCouple, usePartner } from "@/lib/hooks/useProfile";
@@ -25,24 +25,24 @@ export function InvitePartnerCard() {
   };
 
   return (
-    <Card className="border-amber-200 bg-amber-50/50 sm:col-span-2">
-      <h2 className="font-semibold text-amber-950 mb-1">Invite your partner</h2>
-      <p className="text-sm text-stone-600 mb-4">
+    <SketchyStickyNote tapeColor="peach" className="sm:col-span-2">
+      <h2 className="text-base font-bold mb-1">Invite your partner</h2>
+      <p className="text-sm text-muted mb-4 font-sans">
         Set up your desk now — no need to wait. When you&apos;re ready, send this
         link so they can join and play on their own time.
       </p>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Input readOnly value={inviteUrl} className="text-sm bg-white" />
+      <div className="flex flex-col sm:flex-row gap-2 font-sans">
+        <Input readOnly value={inviteUrl} className="text-sm" />
         <Button onClick={copyLink} className="shrink-0">
           {copied ? "Copied!" : "Copy link"}
         </Button>
       </div>
-      <p className="text-xs text-stone-500 mt-3">
+      <p className="text-xs text-muted mt-3 font-sans">
         Or share code:{" "}
-        <span className="font-mono font-bold tracking-widest text-amber-900">
+        <span className="font-bold tracking-widest text-foreground">
           {couple.invite_code}
         </span>
       </p>
-    </Card>
+    </SketchyStickyNote>
   );
 }

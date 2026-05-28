@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { InteractionModal } from "@/components/ui/InteractionModal";
 import { JournalEditor } from "@/components/journal/JournalEditor";
 import { JournalReader } from "@/components/journal/JournalReader";
@@ -20,6 +20,12 @@ export function JournalItem({
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [ruffle, setRuffle] = useState(false);
+
+  const triggerRuffle = useCallback(() => {
+    setRuffle(true);
+    setTimeout(() => setRuffle(false), 400);
+  }, []);
   const { data: entries = [] } = useJournalEntries(coupleId ?? undefined);
   const { saveEntry, deleteEntry } = useJournalMutations(coupleId ?? undefined);
 
@@ -29,9 +35,11 @@ export function JournalItem({
 
   return (
     <>
-      <SharedItemButton label="Open journal" onClick={() => { setOpen(true); setEditing(false); }}>
-        <SharedItemVisual type="journal" size={48} />
-      </SharedItemButton>
+      <div onMouseEnter={triggerRuffle}>
+        <SharedItemButton label="Open journal" onClick={() => { setOpen(true); setEditing(false); }}>
+          <SharedItemVisual type="journal" size={52} ruffle={ruffle} />
+        </SharedItemButton>
+      </div>
       <InteractionModal
         open={open}
         onClose={() => setOpen(false)}

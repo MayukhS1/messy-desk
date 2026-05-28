@@ -15,17 +15,17 @@ export function ItemPalette({
   const remaining = DESK_ITEM_BUDGET - itemCount;
 
   return (
-    <div className="space-y-3 rounded-xl border border-stone-200 bg-white/80 p-4 lg:border-0 lg:bg-transparent lg:p-0">
+    <div className="space-y-3 rounded-xl border-2 border-amber-800/25 bg-yellow-50/60 p-4 filter-hand-drawn lg:border-0 lg:bg-transparent lg:p-0">
       <div>
-        <h3 className="text-sm font-semibold text-stone-800">
+        <h3 className="text-sm font-display font-semibold text-foreground">
           Step 1 · Add items
         </h3>
-        <p className="text-xs text-stone-500 mt-1">
+        <p className="text-xs text-muted mt-1">
           Tap to place on desk, then drag to arrange
         </p>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-stone-500">{remaining} slots left</span>
+        <span className="text-xs text-muted">{remaining} slots left</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {(Object.keys(HUNT_ITEM_META) as HuntItemType[]).map((type) => {
@@ -38,14 +38,14 @@ export function ItemPalette({
               disabled={disabled}
               onClick={() => onAddItem(type)}
               className={cn(
-                "flex flex-col items-center gap-1.5 rounded-xl border border-stone-200 p-3 transition-all min-h-[80px]",
+                "flex flex-col items-center gap-1.5 rounded-xl border-2 border-amber-800/25 p-3 min-h-[80px] filter-hand-drawn sketchy-focus transition-transform",
                 disabled
                   ? "opacity-40 cursor-not-allowed"
-                  : "hover:border-amber-400 hover:bg-amber-50 hover:shadow-sm active:scale-[0.98]"
+                  : "bg-surface/80 hover:border-accent-sunflower/60 hover:scale-105 hover:-rotate-1 active:scale-95 cursor-pointer"
               )}
             >
               <ItemVisual type={type} size={36} />
-              <span className="text-xs font-medium text-stone-600">{meta.label}</span>
+              <span className="text-xs font-medium text-muted">{meta.label}</span>
             </button>
           );
         })}

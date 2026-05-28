@@ -1,21 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1f1f1f;
-  --primary: #225aea;
-  --primary-hover: #1a4ad4;
-  --primary-subtle: rgba(34, 90, 234, 0.08);
-  --secondary: #f3f3f3;
-  --surface: #ffffff;
-  --on-surface: #000000;
-  --muted: #6b7280;
-  --border: rgba(0, 0, 0, 0.05);
-  --destructive: #d92d20;
-  --destructive-hover: #b42318;
+  --background: #fdfbf7;
+  --foreground: #78350f;
+  --primary: #92400e;
+  --primary-hover: #78350f;
+  --primary-subtle: rgba(252, 211, 77, 0.25);
+  --secondary: #fef3c7;
+  --surface: #fffef9;
+  --on-surface: #78350f;
+  --muted: #a16207;
+  --border: rgba(120, 53, 15, 0.18);
+  --destructive: #dc2626;
+  --destructive-hover: #b91c1c;
   --success: #059669;
-  --overlay: rgba(0, 0, 0, 0.5);
-  --radius-lg: 12px;
+  --overlay: rgba(60, 30, 10, 0.45);
+  --radius-lg: 14px;
+  --accent-sunflower: #fcd34d;
+  --accent-peach: #fdba74;
+  --accent-mint: #a7f3d0;
+  --accent-terracotta: #78350f;
+  --sketch-frequency: 0.04;
 }
 
 @theme inline {
@@ -33,14 +38,67 @@
   --color-destructive-hover: var(--destructive-hover);
   --color-success: var(--success);
   --color-overlay: var(--overlay);
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-plus-jakarta);
+  --color-accent-sunflower: var(--accent-sunflower);
+  --color-accent-peach: var(--accent-peach);
+  --color-accent-mint: var(--accent-mint);
+  --color-accent-terracotta: var(--accent-terracotta);
+  --font-sans: var(--font-nunito);
+  --font-display: var(--font-dynapuff);
   --radius-lg: var(--radius-lg);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+}
+
+.bg-paper-texture {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(253, 186, 116, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(252, 211, 77, 0.06) 0%, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(120, 53, 15, 0.015) 3px,
+      rgba(120, 53, 15, 0.015) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(120, 53, 15, 0.012) 3px,
+      rgba(120, 53, 15, 0.012) 4px
+    );
+}
+
+.filter-hand-drawn {
+  filter: url(#hand-drawn-border);
+}
+
+.sunlight-overlay {
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    rgba(252, 211, 77, 0.12) 0%,
+    transparent 35%,
+    transparent 60%,
+    rgba(120, 53, 15, 0.04) 100%
+  );
+}
+
+.sketchy-focus:focus-visible {
+  outline: 2px dashed var(--accent-terracotta);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -53,23 +111,24 @@ body {
   }
 }
 
-/* Desk zone — hybrid warm accent (scoped, unchanged) */
+/* Desk zone — rich mahogany wood */
 .desk-grid {
   background-image:
-    linear-gradient(rgba(120, 80, 40, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 80, 40, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(120, 80, 40, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 80, 40, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 .desk-wood {
   background: linear-gradient(
     165deg,
-    #d4a574 0%,
-    #c9956a 15%,
-    #b8845f 35%,
-    #c9956a 55%,
-    #a6734d 75%,
-    #8b5e3c 100%
+    #b45309 0%,
+    #92400e 12%,
+    #78350f 28%,
+    #92400e 45%,
+    #a16207 62%,
+    #92400e 78%,
+    #78350f 100%
   );
 }
 
@@ -77,18 +136,102 @@ body {
   background-image: repeating-linear-gradient(
     92deg,
     transparent,
-    transparent 12px,
-    rgba(80, 40, 10, 0.04) 12px,
-    rgba(80, 40, 10, 0.04) 14px
+    transparent 8px,
+    rgba(60, 30, 10, 0.06) 8px,
+    rgba(60, 30, 10, 0.06) 10px
   );
 }
 
 .desk-wood-vignette {
   background: radial-gradient(
-    ellipse 80% 70% at 50% 40%,
-    transparent 40%,
-    rgba(60, 30, 10, 0.12) 100%
+    ellipse 80% 70% at 50% 35%,
+    transparent 35%,
+    rgba(40, 20, 5, 0.18) 100%
   );
+}
+
+.desk-wood-specular {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 240, 0.15) 0%,
+    transparent 25%,
+    transparent 100%
+  );
+}
+
+.desk-selection-glow {
+  outline: 2px dashed var(--accent-sunflower);
+  outline-offset: 3px;
+  animation: desk-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes desk-glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px rgba(252, 211, 77, 0.35);
+  }
+}
+
+@keyframes sketch-wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.5deg);
+  }
+  75% {
+    transform: rotate(-0.5deg);
+  }
+}
+
+@keyframes float-note {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) rotate(12deg);
+  }
+}
+
+@keyframes firefly {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes record-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes steam-rise {
+  0% {
+    opacity: 0.6;
+    transform: translateY(0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scaleX(1.2);
+  }
 }
 
 .prose h1,

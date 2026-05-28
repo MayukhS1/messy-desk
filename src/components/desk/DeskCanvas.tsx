@@ -254,7 +254,7 @@ export function DeskCanvas({
 
       {isView && (
         <div className="absolute inset-x-[3%] top-[5%] bottom-[10%] z-20 flex items-end justify-center pb-6 pointer-events-none">
-          <div className="pointer-events-auto mx-4 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-md">
+          <div className="pointer-events-auto mx-4 border-2 border-amber-800/30 bg-yellow-50/95 px-4 py-3 shadow-lg filter-hand-drawn rotate-[-1deg]">
             <Link href="/desk/edit" className="block">
               <Button size="sm" className="w-full min-w-[140px]">
                 Open editor

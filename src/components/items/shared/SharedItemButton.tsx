@@ -1,7 +1,9 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useStableRotation } from "@/lib/motion/useStableRotation";
 
 export function SharedItemButton({
   children,
@@ -16,24 +18,62 @@ export function SharedItemButton({
   disabled?: boolean;
   className?: string;
 }) {
+  const [pressed, setPressed] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const rotation = useStableRotation(-3, 3);
+
+  const classes = cn(
+    "group relative flex flex-col items-center gap-0.5 p-1 min-h-[72px] min-w-[72px] sketchy-focus cursor-pointer",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-sunflower focus-visible:ring-offset-2",
+    disabled && "cursor-not-allowed opacity-40",
+    className
+  );
+
+  const content = (
+    <span className={cn("transition-transform", pressed && "scale-95")}>
+      {children}
+    </span>
+  );
+
+  if (reduceMotion || disabled) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        onMouseDown={() => setPressed(true)}
+        onMouseUp={() => setPressed(false)}
+        onMouseLeave={() => setPressed(false)}
+        aria-label={label}
+        className={classes}
+      >
+        {content}
+      </button>
+    );
+  }
+
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
       disabled={disabled}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      onMouseLeave={() => setPressed(false)}
       aria-label={label}
-      className={cn(
-        "group relative flex flex-col items-center gap-1.5 rounded-2xl border border-white/60 bg-white/70 p-3 shadow-md backdrop-blur-sm transition-all min-h-[88px] min-w-[88px]",
-        "hover:-translate-y-1 hover:border-amber-300/80 hover:bg-white hover:shadow-lg active:scale-[0.98]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2",
-        disabled && "cursor-not-allowed opacity-40 hover:translate-y-0 hover:shadow-md",
-        className
-      )}
+      className={classes}
+      whileHover={{
+        scale: 1.05,
+        rotate: rotation,
+        boxShadow: "0px 10px 15px rgba(0,0,0,0.1)",
+      }}
+      whileTap={{
+        scale: 0.97,
+        boxShadow: "0px 2px 4px rgba(0,0,0,0.08)",
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
     >
-      <span className="transition-transform group-hover:scale-105">{children}</span>
-      <span className="text-[10px] font-medium uppercase tracking-wide text-stone-600 group-hover:text-amber-900">
-        Tap to open
-      </span>
-    </button>
+      {content}
+    </motion.button>
   );
 }

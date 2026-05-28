@@ -7,8 +7,8 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AppShell>
-      <AppBootstrap>{children}</AppBootstrap>
-    </AppShell>
+    <AppBootstrap>
+      <AppShell>{children}</AppShell>
+    </AppBootstrap>
   );
 }

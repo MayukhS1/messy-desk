@@ -1,7 +1,7 @@
 "use client";
 
 import { InvitePartnerCard } from "@/components/dashboard/InvitePartnerCard";
-import { Card } from "@/components/ui/Card";
+import { SketchyStickyNote } from "@/components/ui/SketchyStickyNote";
 import { Button } from "@/components/ui/Button";
 import { useMyDesk } from "@/lib/hooks/useDesk";
 import { usePartner, useProfile } from "@/lib/hooks/useProfile";
@@ -36,15 +36,15 @@ export function DashboardContent() {
     <div className="grid gap-4 sm:grid-cols-2">
       <InvitePartnerCard />
 
-      <Card>
-        <h2 className="font-semibold text-stone-800 mb-1">Your desk</h2>
-        <p className="text-sm text-stone-500 mb-4">
+      <SketchyStickyNote tapeColor="peach">
+        <h2 className="text-base font-bold mb-1">Your desk</h2>
+        <p className="text-sm text-muted mb-4 font-sans">
           {myItemCount} items · {huntTargets} hunt targets ·{" "}
           <span className="capitalize">{myStatus}</span>
         </p>
         {huntOnMyDesk && (
           <div className="mb-4">
-            <p className="text-xs text-stone-500 mb-2">
+            <p className="text-xs text-muted mb-2 font-sans">
               Partner is hunting your desk
             </p>
             <HuntProgress
@@ -53,7 +53,7 @@ export function DashboardContent() {
             />
           </div>
         )}
-        <div className="flex gap-2">
+        <div className="flex gap-2 font-sans">
           <Link href="/desk/edit">
             <Button variant="secondary" size="sm">
               Edit desk
@@ -65,17 +65,17 @@ export function DashboardContent() {
             </Link>
           )}
         </div>
-      </Card>
+      </SketchyStickyNote>
 
-      <Card>
-        <h2 className="font-semibold text-stone-800 mb-1">
+      <SketchyStickyNote tapeColor="mint">
+        <h2 className="text-base font-bold mb-1">
           {partner?.display_name ?? "Partner"}&apos;s desk
         </h2>
         {!partner ? (
           <>
-            <p className="text-sm text-stone-500 mb-4">
+            <p className="text-sm text-muted mb-4 font-sans">
               Publish your desk and send an invite — your partner can join and
-              hunt whenever they&apos;re ready. No need to be online together.
+              hunt whenever they&apos;re ready.
             </p>
             <Link href="/desk/edit">
               <Button variant="secondary" size="sm">
@@ -85,10 +85,10 @@ export function DashboardContent() {
           </>
         ) : partnerHuntState?.phase === "completed" ? (
           <>
-            <p className="text-sm text-green-700 mb-3 font-medium">
-              Hunt completed! 🎉
+            <p className="text-sm text-success mb-3 font-medium font-sans">
+              Hunt completed!
             </p>
-            <p className="text-sm text-stone-500 mb-4">
+            <p className="text-sm text-muted mb-4 font-sans">
               You found all hidden messages on their desk.
             </p>
             <Link href="/room">
@@ -99,7 +99,7 @@ export function DashboardContent() {
           </>
         ) : partnerHuntState?.phase === "active" ? (
           <>
-            <p className="text-sm text-stone-500 mb-3">
+            <p className="text-sm text-muted mb-3 font-sans">
               Hunt in progress · started{" "}
               <RelativeTime date={partnerHuntState.hunt.started_at} />
             </p>
@@ -110,7 +110,7 @@ export function DashboardContent() {
           </>
         ) : (
           <>
-            <p className="text-sm text-stone-500 mb-4">
+            <p className="text-sm text-muted mb-4 font-sans">
               Explore their desk and find hidden messages — play at your own
               pace.
             </p>
@@ -119,15 +119,15 @@ export function DashboardContent() {
             </Link>
           </>
         )}
-      </Card>
+      </SketchyStickyNote>
 
-      <Card className="sm:col-span-2">
-        <h2 className="font-semibold text-stone-800 mb-2">Shared space</h2>
-        <p className="text-sm text-stone-500 mb-4">
+      <SketchyStickyNote tapeColor="red" className="sm:col-span-2">
+        <h2 className="text-base font-bold mb-2">Shared space</h2>
+        <p className="text-sm text-muted mb-4 font-sans">
           Journal, record player, flora vase, and photo frame — yours to use
           now; your partner adds to it when they join.
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 font-sans">
           <Link href="/room">
             <Button variant="secondary" size="sm">
               Open room
@@ -139,10 +139,10 @@ export function DashboardContent() {
             </Button>
           </Link>
         </div>
-      </Card>
+      </SketchyStickyNote>
 
       {profile && (
-        <p className="sm:col-span-2 text-xs text-stone-400 text-center">
+        <p className="sm:col-span-2 text-xs text-muted text-center font-display">
           Signed in as {profile.display_name}
         </p>
       )}

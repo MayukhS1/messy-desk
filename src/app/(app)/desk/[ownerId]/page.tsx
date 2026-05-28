@@ -3,6 +3,7 @@
 import { use } from "react";
 import { SharedSpaceCanvas } from "@/components/shared-space/SharedSpaceCanvas";
 import { DeskExplorePanel } from "@/components/room/DeskExplorePanel";
+import { CozyMessDecor } from "@/components/decor/CozyMessDecor";
 
 export default function ExploreDeskPage({
   params,
@@ -12,16 +13,17 @@ export default function ExploreDeskPage({
   const { ownerId } = use(params);
 
   return (
-    <div className="space-y-4">
+    <div className="relative space-y-4">
+      <CozyMessDecor variant="full" />
       <div>
-        <h1 className="text-2xl font-serif font-bold text-amber-950">
+        <h1 className="text-2xl font-display font-bold text-foreground">
           Explore desk
         </h1>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-muted">
           Hunt for hidden messages
         </p>
       </div>
-      <div className="rounded-2xl border border-stone-200 overflow-hidden">
+      <div className="relative border-2 border-amber-800/25 bg-surface/60 overflow-hidden filter-hand-drawn rounded-xl">
         <SharedSpaceCanvas />
         <div className="p-4">
           <DeskExplorePanel ownerId={ownerId} />

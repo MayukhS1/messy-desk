@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { HuntChecklist } from "@/components/hunt/HuntChecklist";
 import { MessageReveal } from "@/components/ui/MessageReveal";
 import { Button } from "@/components/ui/Button";
+import { SketchyCard } from "@/components/ui/SketchyCard";
 import type { HuntTarget } from "@/types/database";
 
 export default function HuntDetailPage({
@@ -37,7 +38,7 @@ export default function HuntDetailPage({
   });
 
   if (isLoading) {
-    return <div className="h-64 animate-pulse rounded-xl bg-stone-100" />;
+    return <div className="h-64 animate-pulse rounded-xl bg-secondary filter-hand-drawn" />;
   }
 
   const foundTargets = data?.targets.filter((t) => t.found_at) ?? [];
@@ -45,19 +46,21 @@ export default function HuntDetailPage({
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h1 className="text-2xl font-serif font-bold text-amber-950">
+        <h1 className="text-2xl font-display font-bold text-foreground">
           Hunt recap
         </h1>
-        <p className="text-sm text-stone-500 capitalize">
+        <p className="text-sm text-muted capitalize">
           Status: {data?.hunt?.status}
         </p>
       </div>
 
-      <HuntChecklist targets={data?.targets ?? []} />
+      <SketchyCard rotate={false}>
+        <HuntChecklist targets={data?.targets ?? []} />
+      </SketchyCard>
 
       {foundTargets.length > 0 && (
         <div className="space-y-4">
-          <h2 className="font-semibold text-stone-800">Found messages</h2>
+          <h2 className="font-display font-semibold text-foreground">Found messages</h2>
           {foundTargets.map((t) => (
             <MessageReveal
               key={t.id}

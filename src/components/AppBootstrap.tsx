@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { isEmailVerified } from "@/lib/auth/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
+import { RouteLoader } from "@/components/navigation/RouteLoader";
+
+const BOOTSTRAP_KEY = "messy-desk-bootstrapped";
 
 export function AppBootstrap({ children }: { children: React.ReactNode }) {
-  const queryClient = useQueryClient();
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -20,11 +21,13 @@ export function AppBootstrap({ children }: { children: React.ReactNode }) {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      sessionStorage.removeItem(BOOTSTRAP_KEY);
       setStatus("ready");
       return;
     }
 
     if (!isEmailVerified(user)) {
+      sessionStorage.removeItem(BOOTSTRAP_KEY);
       setStatus("ready");
       return;
     }
@@ -32,36 +35,37 @@ export function AppBootstrap({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.rpc("ensure_user_setup");
 
     if (error) {
+      sessionStorage.removeItem(BOOTSTRAP_KEY);
       setErrorMsg(error.message);
       setStatus("error");
       return;
     }
 
-    await queryClient.invalidateQueries();
+    sessionStorage.setItem(BOOTSTRAP_KEY, "1");
     setStatus("ready");
   };
 
   useEffect(() => {
+    if (sessionStorage.getItem(BOOTSTRAP_KEY) === "1") {
+      setStatus("ready");
+      return;
+    }
     runBootstrap();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (status === "loading") {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <p className="text-stone-500 text-sm">Setting up your desk…</p>
-      </div>
-    );
+    return <RouteLoader message="Setting up your desk…" />;
   }
 
   if (status === "error") {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 px-4 text-center">
-        <p className="text-stone-700 font-medium">Could not set up your account</p>
-        <p className="text-sm text-stone-500 max-w-md">{errorMsg}</p>
-        <p className="text-xs text-stone-400 max-w-md">
+        <p className="text-foreground font-medium">Could not set up your account</p>
+        <p className="text-sm text-muted max-w-md">{errorMsg}</p>
+        <p className="text-xs text-muted max-w-md">
           Run migration{" "}
-          <code className="bg-stone-100 px-1 rounded">
+          <code className="bg-secondary px-1 rounded">
             supabase/migrations/003_repair_user_setup.sql
           </code>{" "}
           in the Supabase SQL editor, then retry.

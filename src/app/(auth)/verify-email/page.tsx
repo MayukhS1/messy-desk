@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { isEmailVerified, authCallbackUrl } from "@/lib/auth/utils";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { SketchyCard } from "@/components/ui/SketchyCard";
+import { AuthShell } from "@/components/auth/AuthShell";
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -78,25 +79,29 @@ function VerifyEmailContent() {
   };
 
   return (
-    <Card className="w-full max-w-md text-center">
-      <p className="text-5xl mb-4">✉️</p>
-      <h1 className="text-2xl font-serif font-bold text-amber-950 mb-2">
+    <SketchyCard rotate={false} className="text-center">
+      <svg className="mx-auto mb-4 filter-hand-drawn" width="48" height="40" viewBox="0 0 48 40" fill="none" aria-hidden>
+        <rect x="4" y="8" width="40" height="28" rx="2" fill="#fef3c7" stroke="#78350f" strokeWidth="1.5" />
+        <path d="M4 12 L24 24 L44 12" stroke="#92400e" strokeWidth="1.5" fill="none" />
+        <circle cx="36" cy="12" r="4" fill="#fcd34d" stroke="#78350f" strokeWidth="1" />
+      </svg>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-2">
         Verify your email
       </h1>
-      <p className="text-sm text-stone-600 mb-6 leading-relaxed">
+      <p className="text-sm text-muted mb-6 leading-relaxed">
         We sent a confirmation link to{" "}
-        <span className="font-medium text-stone-800">{email || "your email"}</span>.
+        <span className="font-medium text-foreground">{email || "your email"}</span>.
         You need to verify before you can set up your desk or invite your partner.
       </p>
 
-      <ol className="text-left text-sm text-stone-600 space-y-2 mb-6 bg-amber-50/80 border border-amber-100 rounded-xl p-4">
-        <li>1. Open the email from Supabase / Messy Desk</li>
+      <ol className="text-left text-sm text-muted space-y-2 mb-6 bg-yellow-50/80 border-2 border-amber-800/20 rounded-xl p-4 filter-hand-drawn">
+        <li>1. Open the email from Messy Desk</li>
         <li>2. Click the confirmation link</li>
         <li>3. Return here and press &quot;I&apos;ve verified&quot;</li>
       </ol>
 
       {status && (
-        <p className="text-sm text-stone-600 mb-4 bg-stone-50 rounded-lg px-3 py-2">
+        <p className="text-sm text-muted mb-4 bg-secondary rounded-lg px-3 py-2">
           {status}
         </p>
       )}
@@ -120,22 +125,22 @@ function VerifyEmailContent() {
         </Button>
       </div>
 
-      <p className="mt-6 text-xs text-stone-400">
+      <p className="mt-6 text-xs text-muted">
         Check spam if you don&apos;t see it.{" "}
-        <Link href="/login" className="text-amber-800 hover:underline">
+        <Link href="/login" className="text-primary hover:underline">
           Back to login
         </Link>
       </p>
-    </Card>
+    </SketchyCard>
   );
 }
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-amber-50 to-stone-100">
-      <Suspense fallback={<div className="text-stone-500">Loading…</div>}>
+    <AuthShell title="Almost there">
+      <Suspense fallback={<div className="text-muted text-center">Loading…</div>}>
         <VerifyEmailContent />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }

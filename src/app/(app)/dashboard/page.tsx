@@ -7,10 +7,10 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-amber-950">
+          <h1 className="text-2xl font-display font-bold text-foreground">
             Dashboard
           </h1>
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-muted">
             Your messy desk at a glance
           </p>
         </div>

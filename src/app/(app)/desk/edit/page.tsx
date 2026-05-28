@@ -161,10 +161,10 @@ export default function DeskEditPage() {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-amber-950">
+          <h1 className="text-2xl font-display font-bold text-foreground">
             Edit your desk
           </h1>
-          <p className="text-sm text-stone-500 mt-1">
+          <p className="text-sm text-muted mt-1">
             Build a scavenger hunt — pick {HUNT_TARGET_COUNT} targets with
             hints, then publish
           </p>
@@ -207,8 +207,8 @@ export default function DeskEditPage() {
                 isHuntTarget={resolvedTargetIds.includes(selected.id)}
               />
           ) : (
-            <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50/80 p-4 text-sm text-stone-500 lg:border-0 lg:bg-transparent lg:p-0">
-              <p className="font-medium text-stone-700 mb-1">No item selected</p>
+            <div className="rounded-xl border-2 border-dashed border-amber-800/25 bg-yellow-50/50 p-4 text-sm text-muted lg:border-0 lg:bg-transparent lg:p-0 filter-hand-drawn">
+              <p className="font-display font-medium text-foreground mb-1">No item selected</p>
               <p className="text-xs leading-relaxed">
                 Tap an item on the desk to write its hidden message, set a
                 clue label, and mark it hunt eligible.
@@ -218,7 +218,7 @@ export default function DeskEditPage() {
         }
       />
 
-      <div className="rounded-xl border border-stone-200 bg-white/80 p-4 sm:p-5">
+      <div className="rounded-xl border-2 border-amber-800/25 bg-surface/80 p-4 sm:p-5 filter-hand-drawn">
         <HuntTargetPicker
           items={items}
           selectedIds={resolvedTargetIds}

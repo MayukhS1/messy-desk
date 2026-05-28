@@ -1,24 +1,29 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { useSketchWobble } from "@/lib/motion/useSketchWobble";
+import { useStableRotation } from "@/lib/motion/useStableRotation";
 
-export function Card({
+export function SketchyCard({
   children,
   className,
+  rotate = true,
 }: {
   children: ReactNode;
   className?: string;
+  rotate?: boolean;
 }) {
   const { onMouseEnter, onMouseLeave } = useSketchWobble();
+  const rotation = useStableRotation(-1.5, 1.5);
 
   return (
     <div
       className={cn(
-        "rounded-xl border-2 border-amber-800/40 bg-surface/95 p-5 shadow-md backdrop-blur-sm filter-hand-drawn",
+        "relative rounded-xl border-2 border-amber-800/60 bg-surface/95 p-5 shadow-md filter-hand-drawn",
         className
       )}
+      style={rotate ? { transform: `rotate(${rotation}deg)` } : undefined}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

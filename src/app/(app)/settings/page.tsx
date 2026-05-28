@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
+import { SketchyCard } from "@/components/ui/SketchyCard";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { InvitePartnerCard } from "@/components/dashboard/InvitePartnerCard";
@@ -34,44 +34,44 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-md space-y-6">
+      <div>
+        <h1 className="text-2xl font-display font-bold text-foreground">
+          Settings
+        </h1>
+        <p className="text-sm text-muted">Your preferences</p>
+      </div>
+
+      <InvitePartnerCard />
+
+      <SketchyCard rotate={false} className="space-y-4">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-amber-950">
-            Settings
-          </h1>
-          <p className="text-sm text-stone-500">Your preferences</p>
+          <label className="text-xs text-muted">Display name</label>
+          <Input
+            value={displayName}
+            onChange={(e) => setDisplayNameOverride(e.target.value)}
+          />
         </div>
 
-        <InvitePartnerCard />
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={soundEnabled}
+            onChange={(e) => setSoundEnabled(e.target.checked)}
+            className="rounded sketchy-focus"
+          />
+          Sound effects enabled
+        </label>
 
-        <Card className="space-y-4">
-          <div>
-            <label className="text-xs text-stone-500">Display name</label>
-            <Input
-              value={displayName}
-              onChange={(e) => setDisplayNameOverride(e.target.value)}
-            />
-          </div>
+        <Button onClick={handleSave} disabled={updateProfile.isPending}>
+          {saved ? "Saved!" : "Save changes"}
+        </Button>
+      </SketchyCard>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={soundEnabled}
-              onChange={(e) => setSoundEnabled(e.target.checked)}
-              className="rounded"
-            />
-            Sound effects enabled
-          </label>
-
-          <Button onClick={handleSave} disabled={updateProfile.isPending}>
-            {saved ? "Saved!" : "Save changes"}
-          </Button>
-        </Card>
-
-        <Card>
-          <Button variant="danger" className="w-full" onClick={logout}>
-            Log out
-          </Button>
-        </Card>
+      <SketchyCard rotate={false}>
+        <Button variant="danger" className="w-full" onClick={logout}>
+          Log out
+        </Button>
+      </SketchyCard>
     </div>
   );
 }

@@ -15,7 +15,7 @@ export function SharedItemSlot({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-1 shrink-0",
+        "flex flex-col items-center gap-0.5 shrink-0 z-10",
         slotId === "slot_journal" && "order-1",
         slotId === "slot_record_player" && "order-2",
         slotId === "slot_flora_vase" && "order-3",
@@ -23,7 +23,7 @@ export function SharedItemSlot({
       )}
     >
       {children}
-      <span className="text-[10px] font-medium uppercase tracking-wide text-stone-500/90 pointer-events-none">
+      <span className="text-[9px] font-display text-amber-900/50 pointer-events-none">
         {label}
       </span>
     </div>
