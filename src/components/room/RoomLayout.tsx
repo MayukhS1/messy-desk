@@ -16,15 +16,13 @@ export function RoomLayout() {
     <div className="relative overflow-hidden">
       <CozyMessDecor variant="full" />
 
-      <div className="relative border-2 border-amber-800/25 bg-surface/60 shadow-lg overflow-hidden filter-hand-drawn rounded-xl">
+      <div className="relative overflow-hidden rounded-xl border-2 border-amber-800/40 bg-surface/95 filter-hand-drawn shadow-lg">
         <SharedSpaceCanvas />
 
-        {/* Sketchy divider — torn paper edge */}
-        <div className="relative h-3 bg-gradient-to-r from-transparent via-amber-800/10 to-transparent">
-          <div className="absolute inset-x-4 top-1 border-t border-dashed border-amber-800/20" />
-        </div>
+        {/* Warm divider between nook and desk */}
+        <div className="relative h-4 border-t-2 border-dashed border-amber-800/25 border-b border-amber-800/40 bg-gradient-to-b from-amber-100/40 to-orange-50/20" />
 
-        <div className="relative p-3 sm:p-4 space-y-4">
+        <div className="relative p-4 sm:p-5 space-y-4 bg-gradient-to-b from-amber-50/90 to-orange-50/40">
           {partner ? (
             <DeskSwitcher
               active={activeDesk}
@@ -32,7 +30,7 @@ export function RoomLayout() {
               partnerName={partner.display_name}
             />
           ) : (
-            <p className="text-sm text-muted text-center font-display">
+            <p className="text-sm font-bold text-center font-display text-[#2F1A0C]">
               Your desk — invite your partner from the dashboard when you&apos;re
               ready for them to hunt.
             </p>
@@ -40,7 +38,10 @@ export function RoomLayout() {
           {activeDesk === "mine" || !partner ? (
             <DeskEditorPanel compact />
           ) : (
-            <DeskExplorePanel ownerId={partner.id} />
+            <DeskExplorePanel
+              ownerId={partner.id}
+              partnerName={partner.display_name}
+            />
           )}
         </div>
       </div>

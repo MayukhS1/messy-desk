@@ -21,7 +21,15 @@ import { Button } from "@/components/ui/Button";
 import { HUNT_TARGET_COUNT } from "@/lib/constants";
 import type { DeskItem } from "@/types/database";
 
-export function DeskExplorePanel({ ownerId }: { ownerId: string }) {
+import { PartnerDeskWaitingState } from "./PartnerDeskWaitingState";
+
+export function DeskExplorePanel({
+  ownerId,
+  partnerName,
+}: {
+  ownerId: string;
+  partnerName?: string;
+}) {
   const { data: deskData, isLoading } = usePartnerDesk(ownerId);
   const { data: huntState, refetch: refetchHunt } = usePartnerHunt(ownerId);
   const { startHunt, markFound } = useHuntMutations();
@@ -108,14 +116,17 @@ export function DeskExplorePanel({ ownerId }: { ownerId: string }) {
   };
 
   if (isLoading) {
-    return <div className="h-[420px] animate-pulse rounded-xl bg-stone-100 lg:h-[520px]" />;
+    return (
+      <div className="h-[260px] animate-pulse rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/50 sm:h-[280px] lg:h-[300px] filter-hand-drawn" />
+    );
   }
 
   if (!deskData) {
     return (
-      <p className="text-sm text-stone-500 text-center py-12">
-        Partner hasn&apos;t published their desk yet.
-      </p>
+      <PartnerDeskWaitingState
+        partnerId={ownerId}
+        partnerName={partnerName ?? "Partner"}
+      />
     );
   }
 

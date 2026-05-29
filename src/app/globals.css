@@ -21,6 +21,10 @@
   --accent-mint: #a7f3d0;
   --accent-terracotta: #78350f;
   --sketch-frequency: 0.04;
+  --sketch-ink: #2f1a0c;
+  --sketch-ink-soft: #1e1b18;
+  --desk-surface: #c9956a;
+  --desk-surface-dark: #92400e;
 }
 
 @theme inline {
@@ -42,6 +46,8 @@
   --color-accent-peach: var(--accent-peach);
   --color-accent-mint: var(--accent-mint);
   --color-accent-terracotta: var(--accent-terracotta);
+  --color-sketch-ink: var(--sketch-ink);
+  --color-desk-surface: var(--desk-surface);
   --font-sans: var(--font-nunito);
   --font-display: var(--font-dynapuff);
   --radius-lg: var(--radius-lg);
@@ -97,8 +103,24 @@ h4,
 }
 
 .sketchy-focus:focus-visible {
-  outline: 2px dashed var(--accent-terracotta);
+  outline: 2px dashed var(--sketch-ink);
   outline-offset: 3px;
+}
+
+.text-sketch-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--sketch-ink);
+  line-height: 1.25;
+}
+
+.border-sketch-ink {
+  border-color: var(--sketch-ink);
+}
+
+.stroke-sketch-ink {
+  stroke: var(--sketch-ink);
+  color: var(--sketch-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

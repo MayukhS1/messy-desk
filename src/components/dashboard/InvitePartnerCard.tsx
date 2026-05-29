@@ -25,7 +25,13 @@ export function InvitePartnerCard() {
   };
 
   return (
-    <SketchyStickyNote tapeColor="peach" className="sm:col-span-2">
+    <SketchyStickyNote
+      tapeColor="peach"
+      className="sm:col-span-2"
+      rotation={-0.5}
+      tapeOffset="left"
+      tapeRotation={-5}
+    >
       <h2 className="text-base font-bold mb-1">Invite your partner</h2>
       <p className="text-sm text-muted mb-4 font-sans">
         Set up your desk now — no need to wait. When you&apos;re ready, send this

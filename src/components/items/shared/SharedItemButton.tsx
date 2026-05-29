@@ -23,7 +23,7 @@ export function SharedItemButton({
   const rotation = useStableRotation(-3, 3);
 
   const classes = cn(
-    "group relative flex flex-col items-center gap-0.5 p-1 min-h-[72px] min-w-[72px] sketchy-focus cursor-pointer",
+    "relative flex flex-col items-center gap-0.5 p-1 min-h-[72px] min-w-[72px] sketchy-focus cursor-pointer",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-sunflower focus-visible:ring-offset-2",
     disabled && "cursor-not-allowed opacity-40",
     className

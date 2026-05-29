@@ -30,14 +30,14 @@ export function JournalItem({
   const { saveEntry, deleteEntry } = useJournalMutations(coupleId ?? undefined);
 
   if (!item) {
-    return <SharedItemVisual type="journal" size={48} className="opacity-40" />;
+    return <SharedItemVisual type="journal" size={72} className="opacity-50" />;
   }
 
   return (
     <>
       <div onMouseEnter={triggerRuffle}>
         <SharedItemButton label="Open journal" onClick={() => { setOpen(true); setEditing(false); }}>
-          <SharedItemVisual type="journal" size={52} ruffle={ruffle} />
+          <SharedItemVisual type="journal" size={72} ruffle={ruffle} />
         </SharedItemButton>
       </div>
       <InteractionModal

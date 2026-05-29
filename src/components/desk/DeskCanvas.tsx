@@ -37,6 +37,9 @@ export function DeskCanvas({
   showGrid,
   surfaceLabel,
   layoutDraggable,
+  surfaceVariant,
+  hideViewOverlay,
+  hideSurfaceLabel,
 }: {
   items: DeskItem[];
   mode: "edit" | "explore" | "view";
@@ -50,6 +53,11 @@ export function DeskCanvas({
   surfaceLabel?: string;
   /** Allow drag during explore to rearrange view (local only). */
   layoutDraggable?: boolean;
+  surfaceVariant?: "default" | "topdown";
+  /** Hide the legacy center "Open editor" overlay in view mode */
+  hideViewOverlay?: boolean;
+  /** Hide the surface title label (room preview) */
+  hideSurfaceLabel?: boolean;
 }) {
   const areaRef = useRef<HTMLDivElement>(null);
   const dragOriginRef = useRef<{ id: string; x: number; y: number } | null>(
@@ -229,6 +237,8 @@ export function DeskCanvas({
         showGrid={showGrid && !isView}
         readonly={isView}
         label={surfaceLabel}
+        hideLabel={hideSurfaceLabel}
+        variant={surfaceVariant ?? (isView ? "topdown" : "default")}
       >
         {canDrag ? (
           <DndContext
@@ -252,7 +262,7 @@ export function DeskCanvas({
         )}
       </DeskSurface>
 
-      {isView && (
+      {isView && !hideViewOverlay && (
         <div className="absolute inset-x-[3%] top-[5%] bottom-[10%] z-20 flex items-end justify-center pb-6 pointer-events-none">
           <div className="pointer-events-auto mx-4 border-2 border-amber-800/30 bg-yellow-50/95 px-4 py-3 shadow-lg filter-hand-drawn rotate-[-1deg]">
             <Link href="/desk/edit" className="block">

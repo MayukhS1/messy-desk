@@ -2,6 +2,9 @@
 
 import type { HuntTarget } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { HuntProgress as HuntHeartProgress } from "./HuntHeartProgress";
+
+export { HuntHeartProgress as HuntProgress };
 
 type HuntTargetWithItem = HuntTarget & {
   desk_item?: {
@@ -75,26 +78,6 @@ export function HuntChecklist({
   );
 }
 
-export function HuntProgress({ found, total }: { found: number; total: number }) {
-  const pct = total > 0 ? (found / total) * 100 : 0;
-
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-xs text-stone-500">
-        <span>Hunt progress</span>
-        <span>
-          {found}/{total} found
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-stone-200 overflow-hidden">
-        <div
-          className="h-full bg-amber-600 transition-all duration-500"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  );
-}
 
 export function MobileHuntDrawer({
   open,

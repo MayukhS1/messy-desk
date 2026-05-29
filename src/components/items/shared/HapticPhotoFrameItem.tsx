@@ -75,14 +75,14 @@ export function HapticPhotoFrameItem({
 
   if (!item) {
     return (
-      <SharedItemVisual type="haptic_photo_frame" size={48} className="opacity-40" />
+      <SharedItemVisual type="haptic_photo_frame" size={72} className="opacity-50" />
     );
   }
 
   return (
     <>
       <SharedItemButton label="Open photo frame" onClick={openModal}>
-        <SharedItemVisual type="haptic_photo_frame" size={48} />
+        <SharedItemVisual type="haptic_photo_frame" size={72} />
       </SharedItemButton>
       <InteractionModal
         open={open}

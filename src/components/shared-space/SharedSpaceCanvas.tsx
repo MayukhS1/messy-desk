@@ -1,5 +1,6 @@
 "use client";
 
+import { CozyWoodenShelf } from "./CozyWoodenShelf";
 import { SharedSpaceBackground } from "./SharedSpaceBackground";
 import { SharedItemSlot } from "./SharedItemSlot";
 import { JournalItem } from "@/components/items/shared/JournalItem";
@@ -14,7 +15,7 @@ export function SharedSpaceCanvas() {
 
   if (isLoading) {
     return (
-      <div className="relative h-52 sm:h-60 rounded-t-xl bg-amber-50/50 animate-pulse filter-hand-drawn" />
+      <div className="relative h-72 animate-pulse rounded-t-xl border-b-2 border-amber-800/40 bg-amber-100/60 sm:h-80" />
     );
   }
 
@@ -26,43 +27,49 @@ export function SharedSpaceCanvas() {
     items.find((i) => i.slot_id === slotId);
 
   return (
-    <div className="relative h-52 sm:h-60 border-b-2 border-amber-800/15">
+    <div className="relative min-h-[19rem] overflow-visible border-b-2 border-amber-800/40 bg-gradient-to-b from-amber-50/80 to-orange-50/50 sm:min-h-[21rem]">
       <SharedSpaceBackground />
 
-      <p className="absolute top-10 left-1/2 -translate-x-1/2 text-[10px] text-amber-900/40 text-center px-4 max-w-md z-10 pointer-events-none font-display">
-        Tap any item to read, listen, or explore
+      <p className="absolute top-10 left-1/2 z-10 -translate-x-1/2 px-4 text-center text-sm font-bold font-display text-[#2F1A0C] max-w-md pointer-events-none">
+        Tap shelf items to explore your nook
       </p>
 
-      {/* Items sitting on shelf */}
-      <div className="absolute inset-x-0 bottom-[22%] sm:bottom-[20%] flex flex-wrap items-end justify-center gap-2 sm:gap-5 px-3 sm:px-6">
-        {SHARED_SLOTS.map(({ slotId, itemType, label }) => {
-          const item = getItem(slotId);
-          const props = { coupleId, item, stats };
+      <div className="relative z-10 flex items-end justify-center pt-12 pb-3 overflow-visible">
+        <CozyWoodenShelf>
+          {SHARED_SLOTS.map(({ slotId, itemType, label, tooltip }) => {
+            const item = getItem(slotId);
+            const props = { coupleId, item, stats };
 
-          let content;
-          switch (itemType) {
-            case "journal":
-              content = <JournalItem {...props} />;
-              break;
-            case "record_player":
-              content = <RecordPlayerItem {...props} />;
-              break;
-            case "flora_vase":
-              content = <FloraVaseItem {...props} />;
-              break;
-            case "haptic_photo_frame":
-              content = <HapticPhotoFrameItem {...props} />;
-              break;
-            default:
-              return null;
-          }
+            let content;
+            switch (itemType) {
+              case "journal":
+                content = <JournalItem {...props} />;
+                break;
+              case "record_player":
+                content = <RecordPlayerItem {...props} />;
+                break;
+              case "flora_vase":
+                content = <FloraVaseItem {...props} />;
+                break;
+              case "haptic_photo_frame":
+                content = <HapticPhotoFrameItem {...props} />;
+                break;
+              default:
+                return null;
+            }
 
-          return (
-            <SharedItemSlot key={slotId} slotId={slotId} label={label}>
-              {content}
-            </SharedItemSlot>
-          );
-        })}
+            return (
+              <SharedItemSlot
+                key={slotId}
+                slotId={slotId}
+                label={label}
+                tooltip={tooltip}
+              >
+                {content}
+              </SharedItemSlot>
+            );
+          })}
+        </CozyWoodenShelf>
       </div>
     </div>
   );

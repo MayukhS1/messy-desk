@@ -46,7 +46,7 @@ export function usePartnerDesk(ownerId?: string) {
         .select("*")
         .eq("owner_id", ownerId!)
         .eq("status", "published")
-        .single();
+        .maybeSingle();
 
       if (!desk) return null;
 

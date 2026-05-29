@@ -59,7 +59,7 @@ export function RecordPlayerItem({
 
   if (!item) {
     return (
-      <SharedItemVisual type="record_player" size={48} className="opacity-40" />
+      <SharedItemVisual type="record_player" size={72} className="opacity-50" />
     );
   }
 
@@ -76,7 +76,7 @@ export function RecordPlayerItem({
         >
           <SharedItemVisual
             type="record_player"
-            size={52}
+            size={72}
             spinning={turntable.state.isPlaying || showNotes}
           />
         </SharedItemButton>

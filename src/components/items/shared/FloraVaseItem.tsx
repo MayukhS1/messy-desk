@@ -21,13 +21,13 @@ export function FloraVaseItem({
   const stage = FLORA_STAGES[stageIndex] ?? FLORA_STAGES[1];
 
   if (!item) {
-    return <SharedItemVisual type="flora_vase" size={48} className="opacity-40" />;
+    return <SharedItemVisual type="flora_vase" size={72} className="opacity-50" />;
   }
 
   return (
     <>
       <SharedItemButton label="View flora vase" onClick={() => setOpen(true)}>
-        <SharedItemVisual type="flora_vase" size={48} floraStage={stageIndex} />
+        <SharedItemVisual type="flora_vase" size={72} floraStage={stageIndex} />
       </SharedItemButton>
       <InteractionModal open={open} onClose={() => setOpen(false)} title="Flora Vase">
         <div className="text-center space-y-4">
