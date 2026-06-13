@@ -27,6 +27,7 @@ cp .env.local.example .env.local
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_SITE_URL` | Optional locally; set to your production URL on Vercel |
 
 In Supabase **Authentication → URL Configuration**, set:
 - **Site URL**: `http://localhost:3000` (or your production URL)
@@ -69,6 +70,40 @@ src/
 supabase/migrations/
 ```
 
-## Deploy
+## Deploy (Vercel)
 
-Deploy to [Vercel](https://vercel.com) and set the same environment variables.
+### 1. Supabase
+
+Run all migrations in the Supabase SQL editor (see Setup above).
+
+In **Authentication → URL Configuration**:
+
+| Setting | Value |
+|---|---|
+| **Site URL** | `https://your-app.vercel.app` |
+| **Redirect URLs** | `https://your-app.vercel.app/auth/callback` |
+| | `http://localhost:3000/auth/callback` (local dev) |
+
+Keep email confirmation enabled under **Authentication → Providers → Email**.
+
+### 2. Vercel project
+
+1. Import the repo at [vercel.com/new](https://vercel.com/new).
+2. Framework preset: **Next.js** (auto-detected).
+3. Add environment variables for **Production** (and Preview if you want branch deploys):
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key |
+| `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` (your production domain) |
+
+4. Deploy. The build runs `next build` and fails early if Supabase env vars are missing.
+
+### 3. After first deploy
+
+- Update Supabase **Site URL** and **Redirect URLs** to match your real Vercel URL (or custom domain).
+- Sign up on production and confirm email links land on `/auth/callback`.
+- Share partner invite links from the dashboard — they use the live domain automatically.
+
+**Do not** add `SUPABASE_SERVICE_ROLE_KEY` to Vercel; it is server-only and not used by this app.

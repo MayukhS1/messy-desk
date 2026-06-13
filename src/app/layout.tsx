@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DynaPuff, Nunito } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { SketchyFilters } from "@/components/ui/SketchyFilters";
+import { getSiteUrl } from "@/lib/env/public";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -17,6 +18,7 @@ const dynaPuff = DynaPuff({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "Messy Desk",
   description: "A playful shared space for couples to hide messages and hunt for hidden notes",
 };
