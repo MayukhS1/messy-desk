@@ -1,9 +1,23 @@
+const VERCEL_DASHBOARD =
+  "Add it in Vercel → Project Settings → Environment Variables";
+
+/** Guidance when a required env var is missing — varies by runtime context. */
+export function getMissingEnvVarHint(): string {
+  if (process.env.VERCEL_ENV === "development") {
+    return `${VERCEL_DASHBOARD}, then restart vercel dev.`;
+  }
+
+  if (process.env.VERCEL === "1") {
+    return `${VERCEL_DASHBOARD}, then redeploy.`;
+  }
+
+  return `${VERCEL_DASHBOARD}, then run vercel dev to load them locally.`;
+}
+
 function required(name: string): string {
   const value = process.env[name]?.trim();
   if (!value) {
-    throw new Error(
-      `Missing required environment variable ${name}. Copy .env.local.example and set it before deploying.`
-    );
+    throw new Error(`Missing required environment variable ${name}. ${getMissingEnvVarHint()}`);
   }
   return value;
 }
