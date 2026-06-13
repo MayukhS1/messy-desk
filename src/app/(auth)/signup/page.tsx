@@ -4,7 +4,13 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { isEmailVerified, authCallbackUrl } from "@/lib/auth/utils";
+import {
+  isEmailVerified,
+  isObfuscatedSignupUser,
+  resendSignupConfirmation,
+  formatAuthEmailError,
+  authCallbackUrl,
+} from "@/lib/auth/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SketchyCard } from "@/components/ui/SketchyCard";
@@ -69,8 +75,52 @@ function SignupForm() {
     });
 
     if (authError) {
-      setError(authError.message);
+      setError(formatAuthEmailError(authError.message));
       setLoading(false);
+      return;
+    }
+
+    if (isObfuscatedSignupUser(data.user)) {
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({ email, password });
+
+      if (!signInError && signInData.user) {
+        if (isEmailVerified(signInData.user)) {
+          router.push("/dashboard");
+          router.refresh();
+          return;
+        }
+
+        const { error: resendError } = await resendSignupConfirmation(
+          supabase,
+          email
+        );
+        const resent = resendError ? "" : "&resent=1";
+        router.push(
+          `/verify-email?email=${encodeURIComponent(email)}${resent}`
+        );
+        router.refresh();
+        return;
+      }
+
+      const { error: resendError } = await resendSignupConfirmation(
+        supabase,
+        email
+      );
+      if (resendError) {
+        setError(
+          /rate limit|too many requests/i.test(resendError.message)
+            ? formatAuthEmailError(resendError.message)
+            : "This email is already registered. Try logging in, or wait a minute and use “Resend confirmation email” on the verify page."
+        );
+        setLoading(false);
+        return;
+      }
+
+      router.push(
+        `/verify-email?email=${encodeURIComponent(email)}&resent=1`
+      );
+      router.refresh();
       return;
     }
 

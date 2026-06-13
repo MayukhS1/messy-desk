@@ -4,7 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { isEmailVerified, authCallbackUrl } from "@/lib/auth/utils";
+import {
+  isEmailVerified,
+  resendSignupConfirmation,
+  formatAuthEmailError,
+} from "@/lib/auth/utils";
 import { Button } from "@/components/ui/Button";
 import { SketchyCard } from "@/components/ui/SketchyCard";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -13,9 +17,12 @@ function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email") ?? "";
+  const resentOnArrival = searchParams.get("resent") === "1";
 
   const [email, setEmail] = useState(emailParam);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(
+    resentOnArrival ? "Confirmation email sent — check your inbox." : ""
+  );
   const [checking, setChecking] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -39,13 +46,9 @@ function VerifyEmailContent() {
     if (!email || resendCooldown > 0) return;
     setStatus("");
     const supabase = createClient();
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: { emailRedirectTo: authCallbackUrl() },
-    });
+    const { error } = await resendSignupConfirmation(supabase, email);
     if (error) {
-      setStatus(error.message);
+      setStatus(formatAuthEmailError(error.message));
       return;
     }
     setStatus("Confirmation email sent — check your inbox.");
