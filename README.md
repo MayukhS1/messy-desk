@@ -27,10 +27,15 @@ cp .env.local.example .env.local
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_SITE_URL` | Production URL (e.g. `https://your-app.vercel.app`) — required for auth email links on Vercel |
 
 In Supabase **Authentication → URL Configuration**, set:
-- **Site URL**: `http://localhost:3000` (or your production URL)
-- **Redirect URLs**: `http://localhost:3000/auth/callback`
+- **Site URL**: your production URL (e.g. `https://your-app.vercel.app`) — not localhost once deployed
+- **Redirect URLs**:
+  - `https://your-app.vercel.app/auth/callback`
+  - `http://localhost:3000/auth/callback` (local dev only)
+
+If confirmation emails still open localhost, update the Supabase Site URL above, set `NEXT_PUBLIC_SITE_URL` in Vercel, redeploy, then **resend** the confirmation email (old emails keep the old redirect).
 
 Email confirmation must be enabled under **Authentication → Providers → Email**.
 
@@ -71,4 +76,12 @@ supabase/migrations/
 
 ## Deploy
 
-Deploy to [Vercel](https://vercel.com) and set the same environment variables.
+Deploy to [Vercel](https://vercel.com) and set:
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `NEXT_PUBLIC_SITE_URL` | `https://your-app.vercel.app` |
+
+Then in Supabase **Authentication → URL Configuration**, set **Site URL** and **Redirect URLs** to your Vercel domain (see Setup above). Redeploy after changing env vars.
