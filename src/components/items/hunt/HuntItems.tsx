@@ -11,24 +11,47 @@ import { useHuntExplore } from "@/components/hunt/HuntExploreContext";
 import { MiniPuzzle, puzzleKindForItem } from "@/components/hunt/MiniPuzzle";
 import { cn } from "@/lib/utils";
 
+function HuntTargetBadge() {
+  return (
+    <div
+      className="absolute -top-1 -right-1 z-10 flex h-7 w-7 items-center justify-center rounded-full border-2 filter-hand-drawn shadow-md"
+      style={{ borderColor: "#3F220F", backgroundColor: "#FCD34D" }}
+      aria-label="Hunt target"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+        <circle cx="6" cy="6" r="4" stroke="#3F220F" strokeWidth="1.5" />
+        <path d="M9 9 L12 12" stroke="#3F220F" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </div>
+  );
+}
+
 function ItemShell({
   item,
   mode,
   isSelected,
+  isHuntTarget,
+  isUnlocked,
+  renderDimensions,
   onSelect,
   children,
 }: ItemInteractionProps & { children?: React.ReactNode }) {
   const isEdit = mode === "edit";
   const isView = mode === "view";
+  const showOpened = mode === "explore" && isUnlocked;
+  const visualSize = Math.round(
+    Math.min(renderDimensions?.width ?? 72, renderDimensions?.height ?? 72) * 0.82
+  );
 
   return (
     <motion.div
       role={isView ? undefined : "button"}
       tabIndex={isView ? undefined : 0}
       className={cn(
-        "relative flex flex-col items-center justify-center select-none touch-manipulation w-[72px] h-[72px]",
+        "relative flex h-full w-full min-h-[48px] min-w-[48px] flex-col items-center justify-center select-none touch-manipulation",
         isEdit && "group",
         isEdit && isSelected && "desk-selection-glow rounded-xl",
+        showOpened && "drop-shadow-[0_6px_12px_rgba(137,84,53,0.35)]",
         mode === "explore" && "cursor-pointer",
         isView && "pointer-events-none"
       )}
@@ -55,7 +78,16 @@ function ItemShell({
       }
       transition={{ type: "spring", stiffness: 300, damping: 15 }}
     >
-      <ItemVisual type={item.item_type} size={56} />
+      <ItemVisual type={item.item_type} size={Math.max(visualSize, 40)} opened={showOpened} />
+      {showOpened && (
+        <span
+          className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold font-display whitespace-nowrap px-1 rounded"
+          style={{ color: "#3F220F", backgroundColor: "rgba(253,251,247,0.9)" }}
+        >
+          tap note
+        </span>
+      )}
+      {isEdit && isHuntTarget && <HuntTargetBadge />}
       {isEdit && (
         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-amber-950/75 px-1.5 py-0.5 text-[9px] text-amber-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           drag to move

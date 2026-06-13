@@ -48,14 +48,12 @@ export function CozyMessDecor({
               strokeWidth="2.5"
               fill="none"
             />
-            {/* Three wavy steam lines */}
             <path
               d="M24 30 Q22 22 25 14 Q23 6 27 0"
               stroke={INK}
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
-              opacity="0.65"
               style={{ animation: "steam-rise 2.4s ease-in-out infinite" }}
             />
             <path
@@ -64,7 +62,6 @@ export function CozyMessDecor({
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
-              opacity="0.55"
               style={{ animation: "steam-rise 2.8s ease-in-out 0.4s infinite" }}
             />
             <path
@@ -73,7 +70,6 @@ export function CozyMessDecor({
               strokeWidth="2.5"
               strokeLinecap="round"
               fill="none"
-              opacity="0.6"
               style={{ animation: "steam-rise 2.2s ease-in-out 0.8s infinite" }}
             />
           </svg>

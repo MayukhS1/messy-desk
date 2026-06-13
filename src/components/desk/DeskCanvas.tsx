@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useCallback, useMemo, useState } from "react";
+import { useRef, useCallback, useMemo, useState, useEffect } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -18,12 +18,18 @@ import {
   clampDeskPosition,
   createRestrictToRect,
 } from "@/components/desk/dndModifiers";
+import {
+  getItemRenderedDimensions,
+  logicalToRendered,
+  renderedToLogical,
+  toLogicalCoordinates,
+} from "@/lib/desk/coordinates";
 import { DeskSurface } from "./DeskSurface";
 import { DraggableDeskItem, StaticDeskItem } from "./DraggableDeskItem";
 import { Button } from "@/components/ui/Button";
 import { HuntExploreProvider } from "@/components/hunt/HuntExploreContext";
-
-const ITEM_SIZE = 72;
+import { ScrapbookRulesCard } from "@/components/editor/ScrapbookRulesCard";
+import { HUNT_TARGET_COUNT } from "@/lib/constants";
 
 export function DeskCanvas({
   items,
@@ -40,6 +46,8 @@ export function DeskCanvas({
   surfaceVariant,
   hideViewOverlay,
   hideSurfaceLabel,
+  huntTargetIds,
+  showRulesCard,
 }: {
   items: DeskItem[];
   mode: "edit" | "explore" | "view";
@@ -58,6 +66,10 @@ export function DeskCanvas({
   hideViewOverlay?: boolean;
   /** Hide the surface title label (room preview) */
   hideSurfaceLabel?: boolean;
+  /** Item ids marked as hunt targets (edit mode badges) */
+  huntTargetIds?: string[];
+  /** Show collapsible scrapbook rules on canvas */
+  showRulesCard?: boolean;
 }) {
   const areaRef = useRef<HTMLDivElement>(null);
   const dragOriginRef = useRef<{ id: string; x: number; y: number } | null>(
@@ -68,7 +80,14 @@ export function DeskCanvas({
     x: number;
     y: number;
   } | null>(null);
+  const [areaSize, setAreaSize] = useState({ width: 0, height: 0 });
+  const [areaRect, setAreaRect] = useState<DOMRect | null>(null);
   const isView = mode === "view";
+  const isEdit = mode === "edit";
+  const targetSet = useMemo(
+    () => new Set(huntTargetIds ?? []),
+    [huntTargetIds]
+  );
   const canDrag =
     (mode === "edit" && !!onItemMove) ||
     (mode === "explore" && layoutDraggable && !!onItemMove);
@@ -84,43 +103,79 @@ export function DeskCanvas({
     })
   );
 
-  const getAreaSize = useCallback(() => {
+  useEffect(() => {
     const el = areaRef.current;
-    if (!el) return { width: 0, height: 0 };
-    return { width: el.clientWidth, height: el.clientHeight };
+    if (!el) return;
+
+    const update = () => {
+      setAreaSize({ width: el.clientWidth, height: el.clientHeight });
+      setAreaRect(el.getBoundingClientRect());
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
-  const clamp = useCallback(
-    (x: number, y: number, scale = 1) => {
-      const { width, height } = getAreaSize();
-      return clampDeskPosition(x, y, width, height, ITEM_SIZE, scale);
+  const getRenderedDimensions = useCallback(
+    (item: DeskItem) => {
+      if (areaSize.width <= 0) {
+        return { width: 48, height: 48 };
+      }
+      return getItemRenderedDimensions(
+        item.item_type,
+        areaSize.width,
+        item.scale ?? 1
+      );
     },
-    [getAreaSize]
+    [areaSize.width]
+  );
+
+  const clampForItem = useCallback(
+    (item: DeskItem, x: number, y: number) => {
+      const { width, height } = areaSize;
+      if (width <= 0 || height <= 0) {
+        return { x, y };
+      }
+      const dims = getRenderedDimensions(item);
+      return clampDeskPosition(x, y, width, height, dims.width, dims.height);
+    },
+    [areaSize, getRenderedDimensions]
+  );
+
+  const toRenderedPosition = useCallback(
+    (item: DeskItem) => {
+      const { width } = areaSize;
+      if (width <= 0) {
+        return { x: item.pos_x, y: item.pos_y };
+      }
+      const logical = toLogicalCoordinates(item.pos_x, item.pos_y);
+      return logicalToRendered(logical.x, logical.y, width);
+    },
+    [areaSize]
   );
 
   const modifiers = useMemo(
-    () => [
-      createRestrictToRect(
-        () => areaRef.current?.getBoundingClientRect() ?? null
-      ),
-    ],
-    []
+    () => [createRestrictToRect(() => areaRect)],
+    [areaRect]
   );
 
   const getItemPosition = useCallback(
     (item: DeskItem) => {
       if (dragPosition?.id === item.id) {
-        return { x: dragPosition.x, y: dragPosition.y };
+        return clampForItem(item, dragPosition.x, dragPosition.y);
       }
-      return clamp(item.pos_x, item.pos_y, item.scale ?? 1);
+      const rendered = toRenderedPosition(item);
+      return clampForItem(item, rendered.x, rendered.y);
     },
-    [clamp, dragPosition]
+    [clampForItem, dragPosition, toRenderedPosition]
   );
 
   const handleDragStart = (event: DragStartEvent) => {
     const item = items.find((i) => i.id === event.active.id);
     if (!item) return;
-    const pos = clamp(item.pos_x, item.pos_y, item.scale ?? 1);
+    const pos = getItemPosition(item);
     dragOriginRef.current = { id: item.id, x: pos.x, y: pos.y };
     setDragPosition({ id: item.id, x: pos.x, y: pos.y });
   };
@@ -132,10 +187,10 @@ export function DeskCanvas({
     const item = items.find((i) => i.id === event.active.id);
     if (!item) return;
 
-    const next = clamp(
+    const next = clampForItem(
+      item,
       origin.x + event.delta.x,
-      origin.y + event.delta.y,
-      item.scale ?? 1
+      origin.y + event.delta.y
     );
     setDragPosition({ id: item.id, x: next.x, y: next.y });
   };
@@ -148,12 +203,13 @@ export function DeskCanvas({
     const item = items.find((i) => i.id === event.active.id);
     if (!item || !onItemMove || !origin) return;
 
-    const next = clamp(
+    const next = clampForItem(
+      item,
       origin.x + event.delta.x,
-      origin.y + event.delta.y,
-      item.scale ?? 1
+      origin.y + event.delta.y
     );
-    onItemMove(item.id, next.x, next.y);
+    const logical = renderedToLogical(next.x, next.y, areaSize.width);
+    onItemMove(item.id, logical.x, logical.y);
   };
 
   const handleDragCancel = () => {
@@ -167,14 +223,17 @@ export function DeskCanvas({
 
     const pos = getItemPosition(item);
     const isDragging = dragPosition?.id === item.id;
+    const dims = getRenderedDimensions(item);
 
     const props = {
       item,
       mode,
       isSelected: selectedId === item.id,
+      isHuntTarget: isEdit && targetSet.has(item.id),
       isUnlocked: unlockedIds?.has(item.id) ?? false,
       onSelect: () => onSelectItem?.(item.id),
       onUnlock: () => onUnlockItem?.(item.id),
+      renderDimensions: dims,
     };
 
     const inner = <Component {...props} />;
@@ -186,8 +245,9 @@ export function DeskCanvas({
           id={item.id}
           x={pos.x}
           y={pos.y}
+          width={dims.width}
+          height={dims.height}
           rotation={item.rotation}
-          scale={item.scale}
           zIndex={isDragging ? 1000 : item.z_index}
         >
           {inner}
@@ -200,8 +260,9 @@ export function DeskCanvas({
         key={item.id}
         x={pos.x}
         y={pos.y}
+        width={dims.width}
+        height={dims.height}
         rotation={item.rotation}
-        scale={item.scale}
         zIndex={item.z_index}
       >
         {inner}
@@ -233,6 +294,22 @@ export function DeskCanvas({
 
   return (
     <div className={cn("relative h-full w-full", className)}>
+      {isEdit && showRulesCard && <ScrapbookRulesCard />}
+
+      {isEdit && huntTargetIds && (
+        <div
+          className="absolute bottom-2 right-2 z-20 border-2 px-2 py-1 text-[10px] font-bold font-display filter-hand-drawn pointer-events-none"
+          style={{
+            borderColor: "#3F220F",
+            backgroundColor:
+              huntTargetIds.length >= HUNT_TARGET_COUNT ? "#d1fae5" : "#FEF3C7",
+            color: "#3F220F",
+          }}
+        >
+          🎯 {huntTargetIds.length}/{HUNT_TARGET_COUNT} targets
+        </div>
+      )}
+
       <DeskSurface
         showGrid={showGrid && !isView}
         readonly={isView}

@@ -33,12 +33,11 @@ export function clampDeskPosition(
   y: number,
   areaWidth: number,
   areaHeight: number,
-  itemSize: number,
-  scale = 1
+  itemWidth: number,
+  itemHeight: number = itemWidth
 ) {
-  const size = Math.round(itemSize * scale);
-  const maxX = Math.max(0, areaWidth - size);
-  const maxY = Math.max(0, areaHeight - size);
+  const maxX = Math.max(0, areaWidth - itemWidth);
+  const maxY = Math.max(0, areaHeight - itemHeight);
   return {
     x: Math.round(Math.max(0, Math.min(maxX, x))),
     y: Math.round(Math.max(0, Math.min(maxY, y))),

@@ -2,9 +2,9 @@
 
 import { useMyDesk } from "@/lib/hooks/useDesk";
 import { DeskCanvas } from "@/components/desk/DeskCanvas";
-import { DeskEditorGrid } from "@/components/desk/DeskEditorGrid";
+import { DeskPreviewFrame } from "@/components/desk/DeskEditorGrid";
 import { DeskPlannerNotes } from "./DeskPlannerNotes";
-import { InteractiveDeskPreview } from "./InteractiveDeskPreview";
+import { TinkerDeskButton } from "./InteractiveDeskPreview";
 
 export function DeskEditorPanel({ compact }: { compact?: boolean }) {
   const { data, isLoading } = useMyDesk();
@@ -14,7 +14,10 @@ export function DeskEditorPanel({ compact }: { compact?: boolean }) {
 
   if (isLoading) {
     return (
-      <div className="h-[260px] animate-pulse rounded-xl border-2 border-amber-800/40 bg-[#c9956a]/60 sm:h-[280px] lg:h-[300px] filter-hand-drawn" />
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <div className="h-64 animate-pulse rounded-xl border-2 border-amber-800/40 bg-amber-50/80 filter-hand-drawn" />
+        <div className="mx-auto aspect-video w-full max-w-lg animate-pulse rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/50 filter-hand-drawn md:max-w-xl" />
+      </div>
     );
   }
 
@@ -24,7 +27,7 @@ export function DeskEditorPanel({ compact }: { compact?: boolean }) {
 
   if (compact) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div>
           <h3 className="text-base font-display font-bold text-[#3F220F]">Your desk</h3>
           <p className="text-sm font-semibold text-[#3F220F]/80 font-sans">
@@ -33,12 +36,16 @@ export function DeskEditorPanel({ compact }: { compact?: boolean }) {
           </p>
         </div>
 
-        <div className="rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/30 p-3 sm:p-4">
-          <DeskEditorGrid
-            frameSize="compact"
-            className="lg:grid-cols-[minmax(0,1fr)_minmax(300px,340px)]"
-            desk={
-              <InteractiveDeskPreview>
+        <div className="rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/25 p-4 sm:p-6 filter-hand-drawn">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+            <DeskPlannerNotes
+              items={items}
+              published={published}
+              className="w-full max-w-none rotate-[0.5deg] lg:sticky lg:top-4"
+            />
+
+            <div className="flex w-full flex-col items-center gap-4">
+              <DeskPreviewFrame className="w-full">
                 <DeskCanvas
                   items={items}
                   mode="view"
@@ -46,23 +53,11 @@ export function DeskEditorPanel({ compact }: { compact?: boolean }) {
                   surfaceVariant="topdown"
                   hideSurfaceLabel
                 />
-              </InteractiveDeskPreview>
-            }
-            sidebar={
-              <DeskPlannerNotes
-                items={items}
-                published={published}
-                className="hidden lg:block"
-              />
-            }
-          />
+              </DeskPreviewFrame>
+              <TinkerDeskButton />
+            </div>
+          </div>
         </div>
-
-        <DeskPlannerNotes
-          items={items}
-          published={published}
-          className="lg:hidden mx-auto"
-        />
       </div>
     );
   }

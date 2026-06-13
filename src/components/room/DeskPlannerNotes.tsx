@@ -2,43 +2,10 @@
 
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { HUNT_TARGET_COUNT } from "@/lib/constants";
+import { evaluateDeskSetup } from "@/lib/desk/readiness";
 import type { DeskItem } from "@/types/database";
 
 const INK = "#3F220F";
-
-type Task = { id: string; text: string; completed: boolean };
-
-function buildTasks(items: DeskItem[], published: boolean): Task[] {
-  const itemCount = items.length;
-  const huntTargetCount = items.filter((i) => i.is_hunt_target).length;
-  const hasHiddenMessages = items.some(
-    (item) => item.hidden_message.trim().length > 0
-  );
-
-  return [
-    {
-      id: "arrange",
-      text: "Arrange items on your desk",
-      completed: itemCount > 0,
-    },
-    {
-      id: "messages",
-      text: "Write hidden messages inside them",
-      completed: hasHiddenMessages,
-    },
-    {
-      id: "targets",
-      text: `Pick ${HUNT_TARGET_COUNT} hunt targets with clues`,
-      completed: huntTargetCount >= HUNT_TARGET_COUNT,
-    },
-    {
-      id: "publish",
-      text: "Publish so your partner can hunt",
-      completed: published,
-    },
-  ];
-}
 
 function TaskCheckmark({ checked }: { checked: boolean }) {
   return (
@@ -80,20 +47,19 @@ export function DeskPlannerNotes({
   published: boolean;
   className?: string;
 }) {
-  const tasks = useMemo(
-    () => buildTasks(items, published),
+  const { tasks } = useMemo(
+    () => evaluateDeskSetup(items, null, published),
     [items, published]
   );
 
   return (
     <div
       className={cn(
-        "relative w-full min-w-[300px] max-w-lg border-2 border-amber-800/40 bg-amber-50 p-6 pt-9 filter-hand-drawn shadow-lg rotate-[0.8deg]",
+        "relative w-full border-[2.5px] border-amber-800/40 bg-amber-50 p-6 pt-9 filter-hand-drawn shadow-lg",
         className
       )}
       aria-label="Your room setup progress"
     >
-      {/* Spiral rings threaded through top border */}
       <div className="absolute -top-4 left-0 right-0 flex justify-around px-5">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="relative flex flex-col items-center">
@@ -119,7 +85,6 @@ export function DeskPlannerNotes({
         ))}
       </div>
 
-      {/* Pushpin — top-left corner */}
       <div
         className="absolute -top-2 left-7 h-4 w-4 rounded-full bg-red-500 shadow-sm z-10"
         style={{ border: `2px solid ${INK}` }}

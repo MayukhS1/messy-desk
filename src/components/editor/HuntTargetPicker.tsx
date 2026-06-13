@@ -112,40 +112,43 @@ export function PublishDialog({
   open,
   onConfirm,
   onCancel,
-  targetCount,
   canPublish,
+  blockedReason,
   saving,
 }: {
   open: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-  targetCount: number;
   canPublish?: boolean;
+  blockedReason?: string | null;
   saving?: boolean;
 }) {
   if (!open) return null;
 
-  const ready = canPublish ?? targetCount === HUNT_TARGET_COUNT;
+  const ready = canPublish ?? false;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <h3 className="text-lg font-semibold mb-2">Publish your desk?</h3>
-        <p className="text-sm text-stone-600 mb-2">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3F220F]/40 p-4">
+      <div className="w-full max-w-sm rounded-2xl border-2 border-amber-800/40 bg-amber-50 p-6 shadow-xl filter-hand-drawn">
+        <h3 className="text-lg font-display font-bold mb-2 text-[#3F220F]">
+          Publish your desk?
+        </h3>
+        <p className="text-sm text-[#3F220F]/80 mb-2 font-display">
           Your partner can explore your desk and hunt for{" "}
           {HUNT_TARGET_COUNT} hidden messages at their own pace.
         </p>
         <p
           className={cn(
-            "text-xs mb-4 rounded-lg px-3 py-2",
+            "text-xs mb-4 rounded-lg px-3 py-2 border-2 font-display",
             ready
-              ? "bg-green-50 text-green-800"
-              : "bg-amber-50 text-amber-800"
+              ? "bg-green-50 text-green-900 border-green-200/80"
+              : "bg-amber-50 text-amber-900 border-amber-200/80"
           )}
         >
           {ready
-            ? `${targetCount} hunt targets selected — you're good to go!`
-            : `Select exactly ${HUNT_TARGET_COUNT} hunt targets before publishing (${targetCount}/${HUNT_TARGET_COUNT}).`}
+            ? "Your room list is complete — you're good to go!"
+            : blockedReason ??
+              "Complete every step on your room list before publishing."}
         </p>
         <div className="flex gap-2">
           <button

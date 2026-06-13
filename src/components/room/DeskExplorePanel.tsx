@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { usePartnerDesk } from "@/lib/hooks/useDesk";
 import {
   usePartnerHunt,
   useHuntMutations,
 } from "@/lib/hooks/useHunt";
 import { DeskCanvas } from "@/components/desk/DeskCanvas";
-import { DeskEditorGrid } from "@/components/desk/DeskEditorGrid";
+import { DeskCanvasFrame, DeskEditorGrid } from "@/components/desk/DeskEditorGrid";
 import {
   HuntChecklist,
   HuntProgress,
@@ -15,8 +15,12 @@ import {
 } from "@/components/hunt/HuntChecklist";
 import {
   FoundCelebration,
-  HuntResultsPanel,
+  HuntKeepsakeSpread,
 } from "@/components/hunt/HuntResultsPanel";
+import {
+  HuntCelebrationParticles,
+  CompletedPostmark,
+} from "@/components/hunt/HuntCelebration";
 import { Button } from "@/components/ui/Button";
 import { HUNT_TARGET_COUNT } from "@/lib/constants";
 import type { DeskItem } from "@/types/database";
@@ -36,39 +40,41 @@ export function DeskExplorePanel({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [startError, setStartError] = useState("");
-  const [layoutPos, setLayoutPos] = useState<Record<string, { x: number; y: number }>>({});
+  const [layoutOverrides, setLayoutOverrides] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
 
-  useEffect(() => {
-    if (!deskData?.items) return;
-    setLayoutPos((prev) => {
-      const next = { ...prev };
-      for (const item of deskData.items) {
-        if (!next[item.id]) {
-          next[item.id] = { x: item.pos_x, y: item.pos_y };
-        }
-      }
-      return next;
-    });
-  }, [deskData?.items]);
-
-  const displayItems: DeskItem[] = useMemo(() => {
+  const displayItems: DeskItem[] = (() => {
     if (!deskData?.items) return [];
     return deskData.items.map((item) => ({
       ...item,
-      pos_x: layoutPos[item.id]?.x ?? item.pos_x,
-      pos_y: layoutPos[item.id]?.y ?? item.pos_y,
+      pos_x: layoutOverrides[item.id]?.x ?? item.pos_x,
+      pos_y: layoutOverrides[item.id]?.y ?? item.pos_y,
     }));
-  }, [deskData?.items, layoutPos]);
+  })();
 
-  const huntData =
-    huntState?.phase === "active"
-      ? { hunt: huntState.hunt, targets: huntState.targets }
-      : null;
+  const huntData = useMemo(
+    () =>
+      huntState?.phase === "active"
+        ? { hunt: huntState.hunt, targets: huntState.targets }
+        : null,
+    [huntState]
+  );
 
-  const completedData =
-    huntState?.phase === "completed"
-      ? { hunt: huntState.hunt, targets: huntState.targets }
-      : null;
+  const completedData = useMemo(
+    () =>
+      huntState?.phase === "completed"
+        ? { hunt: huntState.hunt, targets: huntState.targets }
+        : null,
+    [huntState]
+  );
+
+  const completedUnlockedIds = useMemo(() => {
+    if (!completedData) return null;
+    const set = new Set<string>();
+    completedData.targets.forEach((t) => set.add(t.desk_item_id));
+    return set;
+  }, [completedData]);
 
   const unlockedIds = useMemo(() => {
     const set = new Set<string>();
@@ -86,7 +92,7 @@ export function DeskExplorePanel({
   const total = huntData?.targets.length ?? HUNT_TARGET_COUNT;
 
   const handleLayoutMove = useCallback((id: string, x: number, y: number) => {
-    setLayoutPos((prev) => ({ ...prev, [id]: { x, y } }));
+    setLayoutOverrides((prev) => ({ ...prev, [id]: { x, y } }));
   }, []);
 
   const handleUnlock = async (itemId: string) => {
@@ -117,7 +123,7 @@ export function DeskExplorePanel({
 
   if (isLoading) {
     return (
-      <div className="h-[260px] animate-pulse rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/50 sm:h-[280px] lg:h-[300px] filter-hand-drawn" />
+      <div className="mx-auto aspect-video w-full max-w-4xl animate-pulse rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/50 filter-hand-drawn" />
     );
   }
 
@@ -130,29 +136,40 @@ export function DeskExplorePanel({
     );
   }
 
-  if (completedData) {
+  if (completedData && completedUnlockedIds) {
     return (
-      <div className="space-y-4">
-        <HuntResultsPanel
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-8 py-4 px-3 sm:px-4">
+        <p
+          className="text-center text-sm font-display font-bold"
+          style={{ color: "#3F220F" }}
+        >
+          Tap opened items on the desk to read each note again ✉️
+        </p>
+
+        <div className="relative w-full">
+          <DeskCanvasFrame>
+            <div className="relative h-full w-full">
+              <HuntCelebrationParticles active />
+              <CompletedPostmark completedAt={completedData.hunt.completed_at} />
+              <DeskCanvas
+                items={displayItems}
+                mode="explore"
+                unlockedIds={completedUnlockedIds}
+                layoutDraggable
+                onItemMove={handleLayoutMove}
+                onUnlockItem={() => {}}
+                hideSurfaceLabel
+              />
+            </div>
+          </DeskCanvasFrame>
+        </div>
+
+        <HuntKeepsakeSpread
           targets={completedData.targets}
           completedAt={completedData.hunt.completed_at}
+          huntId={completedData.hunt.id}
+          layout="spread"
         />
-        <DeskEditorGrid
-          desk={
-            <DeskCanvas
-              items={displayItems}
-              mode="explore"
-              unlockedIds={unlockedIds}
-              layoutDraggable
-              onItemMove={handleLayoutMove}
-              surfaceLabel="Partner's desk"
-            />
-          }
-        />
-        <p className="text-xs text-center text-stone-500">
-          Hunt finished — you can&apos;t start this hunt again. Drag items on
-          the desk to get a better view.
-        </p>
       </div>
     );
   }

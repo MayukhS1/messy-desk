@@ -2,53 +2,57 @@
 
 import { cn } from "@/lib/utils";
 
-/** Matches the edit-page desk column: fixed height, same grid width on large screens. */
+const DESK_VIEWPORT_CLASSES =
+  "@container/desk relative mx-auto w-full min-h-0 aspect-video min-w-[280px] max-w-lg md:max-w-xl lg:max-w-4xl";
+
+/** Unified 16:9 desk viewport — editor, hunt, partner, and room previews. */
 export function DeskCanvasFrame({
   children,
   className,
-  size = "default",
 }: {
   children: React.ReactNode;
   className?: string;
-  size?: "default" | "compact";
 }) {
   return (
-    <div
-      className={cn(
-        "relative w-full",
-        size === "compact" ? "h-[260px] sm:h-[280px] lg:h-[300px]" : "h-[420px] lg:h-[520px]",
-        className
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn(DESK_VIEWPORT_CLASSES, className)}>{children}</div>
   );
 }
 
-/** Three-column layout from /desk/edit — keeps desk width identical everywhere. */
+/** @deprecated Alias for DeskCanvasFrame — all views share one viewport spec. */
+export function DeskPreviewFrame({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <DeskCanvasFrame className={className}>{children}</DeskCanvasFrame>
+  );
+}
+
+/** Three-column layout from /desk/edit — desk column uses identical 16:9 frame everywhere. */
 export function DeskEditorGrid({
   palette,
   desk,
   sidebar,
   className,
-  frameSize = "default",
 }: {
   palette?: React.ReactNode;
   desk: React.ReactNode;
   sidebar?: React.ReactNode;
   className?: string;
-  frameSize?: "default" | "compact";
 }) {
   return (
     <div
       className={cn(
-        "grid gap-4 lg:grid-cols-[minmax(0,200px)_minmax(0,1fr)_minmax(280px,320px)]",
+        "grid gap-3 lg:gap-4 lg:grid-cols-[minmax(0,132px)_minmax(0,1fr)_minmax(240px,280px)]",
         className
       )}
     >
       <div className="order-2 lg:order-1">{palette ?? <div className="hidden lg:block" />}</div>
       <div className="order-1 lg:order-2">
-        <DeskCanvasFrame size={frameSize}>{desk}</DeskCanvasFrame>
+        <DeskCanvasFrame>{desk}</DeskCanvasFrame>
       </div>
       <div className="order-3">{sidebar ?? <div className="hidden lg:block" />}</div>
     </div>

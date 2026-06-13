@@ -8,6 +8,9 @@ export interface ItemInteractionProps {
   onUnlock: () => void;
   onSelect?: () => void;
   isSelected?: boolean;
+  isHuntTarget?: boolean;
+  /** Clamped pixel dimensions from desk coordinate engine */
+  renderDimensions?: { width: number; height: number };
 }
 
 export type HuntItemComponent = ComponentType<ItemInteractionProps>;

@@ -10,14 +10,13 @@ import { DeskCanvas } from "@/components/desk/DeskCanvas";
 import { DeskEditorGrid } from "@/components/desk/DeskEditorGrid";
 import { DeskToolbar } from "@/components/desk/DeskToolbar";
 import { ItemPalette } from "@/components/editor/ItemPalette";
-import { ItemConfigPanel } from "@/components/editor/ItemConfigPanel";
-import { EditorGuide } from "@/components/editor/EditorGuide";
 import {
-  HuntTargetPicker,
-  PublishDialog,
-  ClearDeskDialog,
-} from "@/components/editor/HuntTargetPicker";
+  ScrapbookInspector,
+  ScrapbookInspectorIdle,
+} from "@/components/editor/ScrapbookInspector";
+import { PublishDialog, ClearDeskDialog } from "@/components/editor/HuntTargetPicker";
 import { HuntItemType, DeskItem } from "@/types/database";
+import { evaluateDeskSetup, publishBlockedReason } from "@/lib/desk/readiness";
 import { DESK_ITEM_BUDGET, HUNT_TARGET_COUNT } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -41,7 +40,11 @@ export default function DeskEditPage() {
     targetIds ??
     serverItems.filter((i) => i.is_hunt_target).map((i) => i.id);
   const selected = items.find((i) => i.id === selectedId);
-  const canPublish = resolvedTargetIds.length === HUNT_TARGET_COUNT;
+  const setup = evaluateDeskSetup(items, resolvedTargetIds);
+  const { canPublish, completedPrerequisiteCount, totalPrerequisiteCount, targetCount } =
+    setup;
+  const publishHint = publishBlockedReason(items, resolvedTargetIds);
+  const atTargetMax = targetCount >= HUNT_TARGET_COUNT;
 
   const addItem = async (type: HuntItemType) => {
     if (!desk || items.length >= DESK_ITEM_BUDGET) return;
@@ -51,7 +54,7 @@ export default function DeskEditPage() {
       const newItem = createDefaultItem(
         desk.id,
         type,
-        { x: 40 + Math.random() * 200, y: 40 + Math.random() * 120 },
+        { x: 480 + Math.random() * 720, y: 200 + Math.random() * 480 },
         items.length
       );
 
@@ -75,6 +78,25 @@ export default function DeskEditPage() {
       (prev ?? serverItems).map((i) => (i.id === selected.id ? updated : i))
     );
     await saveItem.mutateAsync(updated);
+  };
+
+  const toggleHuntTarget = async (enabled: boolean) => {
+    if (!selected) return;
+
+    if (enabled) {
+      if (atTargetMax && !resolvedTargetIds.includes(selected.id)) return;
+      setTargetIds((prev) => {
+        const base = prev ?? resolvedTargetIds;
+        if (base.includes(selected.id)) return base;
+        return [...base, selected.id];
+      });
+      await updateItem({ is_hunt_eligible: true, is_hunt_target: true });
+    } else {
+      setTargetIds((prev) =>
+        (prev ?? resolvedTargetIds).filter((id) => id !== selected.id)
+      );
+      await updateItem({ is_hunt_target: false, is_hunt_eligible: false });
+    }
   };
 
   const moveItem = async (id: string, x: number, y: number) => {
@@ -141,13 +163,15 @@ export default function DeskEditPage() {
   };
 
   if (isLoading) {
-    return <div className="h-96 animate-pulse rounded-xl bg-stone-100" />;
+    return (
+      <div className="h-[380px] animate-pulse rounded-xl border-2 border-amber-800/30 bg-[#e8dcc8]/40 filter-hand-drawn" />
+    );
   }
 
   if (!desk) {
     return (
       <div className="space-y-4 text-center py-12">
-        <p className="text-stone-600">Your desk wasn&apos;t found.</p>
+        <p className="text-stone-600 font-display">Your desk wasn&apos;t found.</p>
         <p className="text-sm text-stone-500">
           Try refreshing — if this persists, run migration 003 in Supabase SQL
           editor.
@@ -158,78 +182,76 @@ export default function DeskEditPage() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">
+          <h1 className="text-xl sm:text-2xl font-display font-bold text-[#3F220F]">
             Edit your desk
           </h1>
-          <p className="text-sm text-muted mt-1">
-            Build a scavenger hunt — pick {HUNT_TARGET_COUNT} targets with
-            hints, then publish
+          <p className="text-xs sm:text-sm text-muted mt-0.5 font-display">
+            Drag items on the desk · click one to plan clues &amp; secrets
           </p>
         </div>
         <DeskToolbar
           onSave={async () => refetch()}
-          onPublish={() => setShowPublish(true)}
+          onPublish={() => canPublish && setShowPublish(true)}
           onClearDesk={() => setShowClearDesk(true)}
           saving={saving}
-          targetCount={resolvedTargetIds.length}
+          canPublish={canPublish}
+          completedSteps={completedPrerequisiteCount}
+          totalSteps={totalPrerequisiteCount}
           itemCount={items.length}
+          publishHint={publishHint ?? undefined}
         />
       </div>
 
-      <EditorGuide />
-
       {actionError && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <p className="text-sm text-red-700 bg-red-50 border-2 border-red-200/80 rounded-lg px-3 py-2 filter-hand-drawn">
           {actionError}
         </p>
       )}
 
-      <DeskEditorGrid
-        palette={<ItemPalette itemCount={items.length} onAddItem={addItem} />}
-        desk={
-          <DeskCanvas
-            items={items}
-            mode="edit"
-            selectedId={selectedId}
-            onSelectItem={setSelectedId}
-            onItemMove={moveItem}
-          />
-        }
-        sidebar={
-          selected ? (
-              <ItemConfigPanel
+      <div className="rounded-xl border-2 border-amber-800/40 bg-[#e8dcc8]/20 p-3 sm:p-4 filter-hand-drawn">
+        <DeskEditorGrid
+          palette={<ItemPalette itemCount={items.length} onAddItem={addItem} />}
+          desk={
+            <DeskCanvas
+              items={items}
+              mode="edit"
+              selectedId={selectedId}
+              onSelectItem={setSelectedId}
+              onItemMove={moveItem}
+              huntTargetIds={resolvedTargetIds}
+              showRulesCard
+              showGrid
+            />
+          }
+          sidebar={
+            selected ? (
+              <ScrapbookInspector
                 item={selected}
-                onUpdate={updateItem}
-                onDelete={removeItem}
                 isHuntTarget={resolvedTargetIds.includes(selected.id)}
+                targetCount={resolvedTargetIds.length}
+                atTargetMax={atTargetMax}
+                onUpdate={updateItem}
+                onToggleHuntTarget={toggleHuntTarget}
+                onDelete={removeItem}
               />
-          ) : (
-            <div className="rounded-xl border-2 border-dashed border-amber-800/25 bg-yellow-50/50 p-4 text-sm text-muted lg:border-0 lg:bg-transparent lg:p-0 filter-hand-drawn">
-              <p className="font-display font-medium text-foreground mb-1">No item selected</p>
-              <p className="text-xs leading-relaxed">
-                Tap an item on the desk to write its hidden message, set a
-                clue label, and mark it hunt eligible.
-              </p>
-            </div>
-          )
-        }
-      />
-
-      <div className="rounded-xl border-2 border-amber-800/25 bg-surface/80 p-4 sm:p-5 filter-hand-drawn">
-        <HuntTargetPicker
-          items={items}
-          selectedIds={resolvedTargetIds}
-          onChange={setTargetIds}
+            ) : (
+              <ScrapbookInspectorIdle
+                completedSteps={completedPrerequisiteCount}
+                totalSteps={totalPrerequisiteCount}
+                itemCount={items.length}
+              />
+            )
+          }
         />
       </div>
 
       <PublishDialog
         open={showPublish}
-        targetCount={resolvedTargetIds.length}
         canPublish={canPublish}
+        blockedReason={publishHint}
         saving={saving}
         onConfirm={handlePublish}
         onCancel={() => setShowPublish(false)}

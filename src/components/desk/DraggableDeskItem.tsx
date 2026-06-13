@@ -7,8 +7,9 @@ export function DraggableDeskItem({
   id,
   x,
   y,
+  width,
+  height,
   rotation,
-  scale,
   zIndex,
   disabled,
   children,
@@ -16,8 +17,9 @@ export function DraggableDeskItem({
   id: string;
   x: number;
   y: number;
+  width: number;
+  height: number;
   rotation: number;
-  scale: number;
   zIndex: number;
   disabled?: boolean;
   children: React.ReactNode;
@@ -27,13 +29,23 @@ export function DraggableDeskItem({
     disabled,
   });
 
+  const dragRotation = isDragging ? rotation + (rotation >= 0 ? 3 : -3) : rotation;
+  const dragScale = isDragging ? 1.06 : 1;
+
   const style: React.CSSProperties = {
     position: "absolute",
     left: x,
     top: y,
+    width,
+    height,
     zIndex: isDragging ? 1000 : zIndex,
-    transform: `rotate(${rotation}deg) scale(${scale})`,
+    transform: `rotate(${dragRotation}deg) scale(${dragScale})`,
+    transformOrigin: "center center",
     touchAction: disabled ? "auto" : "none",
+    filter: isDragging
+      ? "drop-shadow(0 12px 16px rgba(137, 84, 53, 0.45))"
+      : undefined,
+    transition: isDragging ? undefined : "filter 0.15s ease",
   };
 
   return (
@@ -54,15 +66,17 @@ export function DraggableDeskItem({
 export function StaticDeskItem({
   x,
   y,
+  width,
+  height,
   rotation,
-  scale,
   zIndex,
   children,
 }: {
   x: number;
   y: number;
+  width: number;
+  height: number;
   rotation: number;
-  scale: number;
   zIndex: number;
   children: React.ReactNode;
 }) {
@@ -72,8 +86,11 @@ export function StaticDeskItem({
         position: "absolute",
         left: x,
         top: y,
+        width,
+        height,
         zIndex,
-        transform: `rotate(${rotation}deg) scale(${scale})`,
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: "center center",
       }}
     >
       {children}

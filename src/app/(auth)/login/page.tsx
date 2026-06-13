@@ -23,25 +23,37 @@ export default function LoginPage() {
     setError("");
 
     const supabase = createClient();
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
-    }
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (data.user && !isEmailVerified(data.user)) {
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user && !isEmailVerified(data.user)) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        router.refresh();
+        return;
+      }
+
+      router.push("/dashboard");
       router.refresh();
-      return;
+    } catch (err) {
+      const message =
+        err instanceof TypeError && err.message === "Failed to fetch"
+          ? "Could not reach Supabase. Check NEXT_PUBLIC_SUPABASE_URL in .env.local — the project may be paused, deleted, or the URL may be wrong. Restart npm run dev after updating."
+          : err instanceof Error
+            ? err.message
+            : "Something went wrong. Please try again.";
+      setError(message);
+      setLoading(false);
     }
-
-    router.push("/dashboard");
-    router.refresh();
   };
 
   return (

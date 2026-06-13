@@ -71,17 +71,17 @@ export function DeskSurface({
               className="absolute inset-0 opacity-40 pointer-events-none desk-wood-grain"
               style={{ mixBlendMode: "multiply" }}
             />
-            <div className="absolute inset-[6%] desk-grid rounded-lg opacity-25 pointer-events-none" />
+            <div className="absolute inset-[4%] desk-grid rounded-lg opacity-30 pointer-events-none" />
           </>
         )}
 
         {/* Inner desk mat — dashed stitching */}
         <div
-          className="absolute inset-[4%] rounded-lg pointer-events-none"
+          className="absolute inset-[3%] rounded-lg pointer-events-none"
           style={{ border: `2px dashed ${INK}`, opacity: isTopDown ? 0.45 : 0.35 }}
         />
         <div
-          className="absolute inset-[7%] rounded-md pointer-events-none"
+          className="absolute inset-[5%] rounded-md pointer-events-none"
           style={{
             border: `1px dashed ${INK}`,
             opacity: isTopDown ? 0.2 : 0,
@@ -97,10 +97,12 @@ export function DeskSurface({
         )}
 
         {(showGrid || isTopDown) && !isTopDown && (
-          <div className="absolute inset-[8%] desk-grid rounded-lg opacity-35 pointer-events-none" />
+          <div className="absolute inset-[5%] desk-grid rounded-lg opacity-35 pointer-events-none" />
         )}
 
-        <div className="absolute inset-[8%] overflow-hidden rounded-lg">{children}</div>
+        <div className="desk-canvas-area absolute inset-[5%] overflow-hidden rounded-lg">
+          {children}
+        </div>
       </div>
 
       {!isTopDown && (
