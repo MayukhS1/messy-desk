@@ -17,15 +17,17 @@ A playful shared space for couples — hide messages in a messy desk, invite you
    - [`supabase/migrations/002_partner_invites.sql`](supabase/migrations/002_partner_invites.sql)
    - [`supabase/migrations/003_repair_user_setup.sql`](supabase/migrations/003_repair_user_setup.sql) **← run this if desk/signup doesn't work**
 
-3. Add environment variables in **Vercel → Project Settings → Environment Variables** (see [`.env.local.example`](.env.local.example) for names only — it is not loaded by the app):
+3. Copy env template and fill in values:
+
+```bash
+cp .env.local.example .env.local
+```
 
 | Variable | Description |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-| `NEXT_PUBLIC_SITE_URL` | Your production URL (e.g. `https://your-app.vercel.app`) |
-
-For local development, run `vercel link` then `vercel dev` — env vars are injected from your Vercel project (no local env file required).
+| `NEXT_PUBLIC_SITE_URL` | Optional locally; set to your production URL on Vercel |
 
 In Supabase **Authentication → URL Configuration**, set:
 - **Site URL**: `http://localhost:3000` (or your production URL)
@@ -33,12 +35,11 @@ In Supabase **Authentication → URL Configuration**, set:
 
 Email confirmation must be enabled under **Authentication → Providers → Email**.
 
-4. Install and run (requires [Vercel CLI](https://vercel.com/docs/cli)):
+4. Install and run:
 
 ```bash
 npm install
-vercel link
-vercel dev
+npm run dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000).
@@ -86,8 +87,6 @@ In **Authentication → URL Configuration**:
 Keep email confirmation enabled under **Authentication → Providers → Email**.
 
 ### 2. Vercel project
-
-Environment variables are read from Vercel at build and runtime — no env files are used in production.
 
 1. Import the repo at [vercel.com/new](https://vercel.com/new).
 2. Framework preset: **Next.js** (auto-detected).

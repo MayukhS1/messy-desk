@@ -47,7 +47,7 @@ export default function LoginPage() {
     } catch (err) {
       const message =
         err instanceof TypeError && err.message === "Failed to fetch"
-          ? "Could not reach Supabase. Check NEXT_PUBLIC_SUPABASE_URL in your Vercel environment variables — the project may be paused, deleted, or the URL may be wrong."
+          ? "Could not reach Supabase. Check NEXT_PUBLIC_SUPABASE_URL in .env.local — the project may be paused, deleted, or the URL may be wrong. Restart npm run dev after updating."
           : err instanceof Error
             ? err.message
             : "Something went wrong. Please try again.";
