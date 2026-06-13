@@ -147,7 +147,43 @@ export function useDeskMutations() {
     },
   });
 
-  return { saveItem, deleteItem, clearAllItems, publishDesk };
+  const unpublishDesk = useMutation({
+    mutationFn: async (deskId: string) => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: activeHunt } = await supabase
+        .from("hunts")
+        .select("id")
+        .eq("desk_owner_id", user.id)
+        .eq("status", "active")
+        .maybeSingle();
+
+      if (activeHunt) {
+        throw new Error(
+          "Your partner is mid-hunt — wait until they finish before unpublishing."
+        );
+      }
+
+      const { error } = await supabase
+        .from("desks")
+        .update({ status: "draft", published_at: null })
+        .eq("id", deskId)
+        .eq("owner_id", user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["desk"] });
+      queryClient.invalidateQueries({ queryKey: ["hunt-on-my-desk"] });
+      queryClient.invalidateQueries({ queryKey: ["partner-hunt"] });
+    },
+  });
+
+  return { saveItem, deleteItem, clearAllItems, publishDesk, unpublishDesk };
 }
 
 export function createDefaultItem(

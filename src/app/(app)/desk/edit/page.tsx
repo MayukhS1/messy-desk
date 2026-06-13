@@ -14,21 +14,25 @@ import {
   ScrapbookInspector,
   ScrapbookInspectorIdle,
 } from "@/components/editor/ScrapbookInspector";
-import { PublishDialog, ClearDeskDialog } from "@/components/editor/HuntTargetPicker";
+import { PublishDialog, UnpublishDialog, ClearDeskDialog } from "@/components/editor/HuntTargetPicker";
 import { HuntItemType, DeskItem } from "@/types/database";
 import { evaluateDeskSetup, publishBlockedReason } from "@/lib/desk/readiness";
 import { DESK_ITEM_BUDGET, HUNT_TARGET_COUNT } from "@/lib/constants";
+import { useHuntForOwner } from "@/lib/hooks/useHunt";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 
 export default function DeskEditPage() {
   const router = useRouter();
   const { data, isLoading, refetch } = useMyDesk();
-  const { saveItem, deleteItem, clearAllItems, publishDesk } = useDeskMutations();
+  const { data: huntOnMyDesk } = useHuntForOwner();
+  const { saveItem, deleteItem, clearAllItems, publishDesk, unpublishDesk } =
+    useDeskMutations();
   const [editedItems, setEditedItems] = useState<DeskItem[] | null>(null);
   const [targetIds, setTargetIds] = useState<string[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showPublish, setShowPublish] = useState(false);
+  const [showUnpublish, setShowUnpublish] = useState(false);
   const [showClearDesk, setShowClearDesk] = useState(false);
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -40,11 +44,17 @@ export default function DeskEditPage() {
     targetIds ??
     serverItems.filter((i) => i.is_hunt_target).map((i) => i.id);
   const selected = items.find((i) => i.id === selectedId);
-  const setup = evaluateDeskSetup(items, resolvedTargetIds);
+  const isPublished = desk?.status === "published";
+  const setup = evaluateDeskSetup(items, resolvedTargetIds, isPublished);
   const { canPublish, completedPrerequisiteCount, totalPrerequisiteCount, targetCount } =
     setup;
   const publishHint = publishBlockedReason(items, resolvedTargetIds);
   const atTargetMax = targetCount >= HUNT_TARGET_COUNT;
+  const hasActiveHunt = !!huntOnMyDesk;
+  const canUnpublish = isPublished && !hasActiveHunt;
+  const unpublishHint = hasActiveHunt
+    ? "Your partner is hunting — unpublish is locked until they finish."
+    : undefined;
 
   const addItem = async (type: HuntItemType) => {
     if (!desk || items.length >= DESK_ITEM_BUDGET) return;
@@ -150,6 +160,7 @@ export default function DeskEditPage() {
   const handlePublish = async () => {
     if (!desk || !canPublish) return;
     setSaving(true);
+    setActionError("");
     try {
       await publishDesk.mutateAsync({ deskId: desk.id, targetIds: resolvedTargetIds });
       setShowPublish(false);
@@ -157,6 +168,29 @@ export default function DeskEditPage() {
       setTargetIds(null);
       refetch();
       router.push("/dashboard");
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Failed to publish desk"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!desk || !canUnpublish) return;
+    setSaving(true);
+    setActionError("");
+    try {
+      await unpublishDesk.mutateAsync(desk.id);
+      setShowUnpublish(false);
+      setEditedItems(null);
+      setTargetIds(null);
+      refetch();
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Failed to unpublish desk"
+      );
     } finally {
       setSaving(false);
     }
@@ -195,13 +229,17 @@ export default function DeskEditPage() {
         <DeskToolbar
           onSave={async () => refetch()}
           onPublish={() => canPublish && setShowPublish(true)}
+          onUnpublish={() => setShowUnpublish(true)}
           onClearDesk={() => setShowClearDesk(true)}
           saving={saving}
+          isPublished={isPublished}
           canPublish={canPublish}
+          canUnpublish={canUnpublish}
           completedSteps={completedPrerequisiteCount}
           totalSteps={totalPrerequisiteCount}
           itemCount={items.length}
           publishHint={publishHint ?? undefined}
+          unpublishHint={unpublishHint}
         />
       </div>
 
@@ -255,6 +293,15 @@ export default function DeskEditPage() {
         saving={saving}
         onConfirm={handlePublish}
         onCancel={() => setShowPublish(false)}
+      />
+
+      <UnpublishDialog
+        open={showUnpublish}
+        canUnpublish={canUnpublish}
+        blockedReason={unpublishHint}
+        saving={saving}
+        onConfirm={handleUnpublish}
+        onCancel={() => setShowUnpublish(false)}
       />
 
       <ClearDeskDialog

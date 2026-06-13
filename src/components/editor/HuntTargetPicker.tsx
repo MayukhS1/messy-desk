@@ -153,7 +153,7 @@ export function PublishDialog({
         <div className="flex gap-2">
           <button
             type="button"
-            className="flex-1 rounded-xl border border-stone-200 py-2.5 min-h-[44px] text-stone-700 font-medium transition-colors hover:bg-stone-100 hover:border-stone-300 active:bg-stone-200"
+            className="flex-1 rounded-xl border-2 border-[#3F220F]/30 py-2.5 min-h-[44px] font-bold font-display text-[#3F220F] transition-colors hover:bg-[#FEF3C7] active:bg-[#FDE68A] filter-hand-drawn sketchy-focus"
             onClick={onCancel}
             disabled={saving}
           >
@@ -162,15 +162,85 @@ export function PublishDialog({
           <button
             type="button"
             className={cn(
-              "flex-1 rounded-xl py-2.5 min-h-[44px] font-medium text-white transition-colors",
+              "flex-1 rounded-xl py-2.5 min-h-[44px] font-bold font-display filter-hand-drawn sketchy-focus transition-colors",
               ready
-                ? "bg-amber-700 hover:bg-amber-800 active:bg-amber-900"
-                : "bg-stone-300 cursor-not-allowed"
+                ? "border-2 border-[#3F220F] bg-[#55702C] text-[#FDFBF7] hover:bg-[#466025] active:bg-[#3d5520]"
+                : "border-stone-300 bg-stone-200 text-stone-500 cursor-not-allowed"
             )}
             onClick={onConfirm}
             disabled={!ready || saving}
           >
             {saving ? "Publishing…" : "Publish"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function UnpublishDialog({
+  open,
+  onConfirm,
+  onCancel,
+  canUnpublish,
+  blockedReason,
+  saving,
+}: {
+  open: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  canUnpublish?: boolean;
+  blockedReason?: string | null;
+  saving?: boolean;
+}) {
+  if (!open) return null;
+
+  const allowed = canUnpublish ?? false;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#3F220F]/40 p-4">
+      <div className="w-full max-w-sm rounded-2xl border-2 border-amber-800/40 bg-amber-50 p-6 shadow-xl filter-hand-drawn">
+        <h3 className="text-lg font-display font-bold mb-2 text-[#3F220F]">
+          Unpublish your desk?
+        </h3>
+        <p className="text-sm text-[#3F220F]/80 mb-2 font-display">
+          Your desk goes back to draft mode. Your partner won&apos;t be able to
+          hunt until you publish again.
+        </p>
+        <p
+          className={cn(
+            "text-xs mb-4 rounded-lg px-3 py-2 border-2 font-display",
+            allowed
+              ? "bg-amber-50 text-amber-900 border-amber-200/80"
+              : "bg-red-50 text-red-900 border-red-200/80"
+          )}
+        >
+          {allowed
+            ? "Your partner hasn&apos;t started hunting yet — safe to unpublish."
+            : blockedReason ??
+              "Unpublish is locked while your partner is mid-hunt."}
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="flex-1 rounded-xl border-2 border-[#3F220F]/30 py-2.5 min-h-[44px] font-bold font-display text-[#3F220F] transition-colors hover:bg-[#FEF3C7] active:bg-[#FDE68A] filter-hand-drawn sketchy-focus"
+            onClick={onCancel}
+            disabled={saving}
+          >
+            Keep published
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "flex-1 rounded-xl border-2 py-2.5 min-h-[44px] font-bold font-display filter-hand-drawn sketchy-focus transition-colors",
+              allowed
+                ? "border-[#3F220F] bg-[#AE5B22] text-[#FDFBF7] hover:bg-[#9A4F1E] active:bg-[#8B4519]"
+                : "border-stone-300 bg-stone-200 text-stone-500 cursor-not-allowed"
+            )}
+            onClick={onConfirm}
+            disabled={!allowed || saving}
+          >
+            {saving ? "Unpublishing…" : "Unpublish"}
           </button>
         </div>
       </div>
